@@ -17,3 +17,21 @@ export const GET_PROJECTS_QUERY = gql`
     }
   }
 `;
+
+export const GET_PROJECT_QUERY = gql`
+  query GetProject($id: Int!) {
+    project(id: $id) {
+      id
+      name
+      location
+      ownerId
+      owner {
+        id
+        name
+        email
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
