@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
 import prisma from "../../db.js";
-import { requireAuth, requireProjectAccess, requireCreatorOrOwner } from "../../middleware/auth.js";
+import { requireAuth, requirePermission, requireCreatorOrPermission, PERMISSIONS } from "../../middleware/auth.js";
 import type { AppContext } from "../../context.js";
 
 const include = { user: true } as const;
@@ -13,7 +13,7 @@ export const expenseResolvers = {
       context: AppContext,
     ) => {
       const userId = requireAuth(context);
-      await requireProjectAccess(projectId, userId);
+      await requirePermission(projectId, userId, PERMISSIONS.EXPENSE.READ);
       return prisma.expense.findMany({
         where: { projectId },
         include,
@@ -33,7 +33,7 @@ export const expenseResolvers = {
       context: AppContext,
     ) => {
       const userId = requireAuth(context);
-      await requireProjectAccess(projectId, userId);
+      await requirePermission(projectId, userId, PERMISSIONS.EXPENSE.CREATE);
       return prisma.expense.create({
         data: { projectId, name, amount, userId },
         include,
@@ -52,7 +52,7 @@ export const expenseResolvers = {
           extensions: { code: "NOT_FOUND" },
         });
       }
-      await requireCreatorOrOwner(expense.userId, expense.projectId, userId);
+      await requireCreatorOrPermission(expense.userId, expense.projectId, userId, PERMISSIONS.EXPENSE.UPDATE);
       return prisma.expense.update({
         where: { id },
         data: {
@@ -75,7 +75,7 @@ export const expenseResolvers = {
           extensions: { code: "NOT_FOUND" },
         });
       }
-      await requireCreatorOrOwner(expense.userId, expense.projectId, userId);
+      await requireCreatorOrPermission(expense.userId, expense.projectId, userId, PERMISSIONS.EXPENSE.DELETE);
       await prisma.expense.delete({ where: { id } });
       return true;
     },

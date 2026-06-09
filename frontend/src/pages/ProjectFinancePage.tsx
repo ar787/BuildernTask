@@ -22,7 +22,11 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { GET_EXPENSES_QUERY, GET_INCOMES_QUERY, GET_PROJECT_QUERY } from "../graphql/queries";
+import {
+  GET_EXPENSES_QUERY,
+  GET_INCOMES_QUERY,
+  GET_PROJECT_QUERY,
+} from "../graphql/queries";
 import { useAuth } from "../hooks/useAuth";
 import {
   CREATE_EXPENSE_MUTATION,
@@ -61,9 +65,11 @@ export function ProjectFinancePage() {
     variables: { id: projectId },
   });
 
-  const ownerId = (projectData as { project?: { ownerId: number } })?.project?.ownerId;
-  const canModify = (entry: Entry) =>
-    user?.id === entry.userId || user?.id === ownerId;
+  const ownerId = (projectData as { project?: { ownerId: number } })?.project
+    ?.ownerId;
+  const canModify = (entry: Entry) => {
+    return user?.id === entry.userId || user?.id === ownerId;
+  };
 
   const {
     data: expenseData,
