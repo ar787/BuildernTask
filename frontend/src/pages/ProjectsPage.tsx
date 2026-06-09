@@ -17,12 +17,16 @@ import {
   DialogTitle,
   TextField,
   Typography,
+  AppBar,
+  Toolbar,
   CircularProgress,
   Alert,
 } from "@mui/material";
-
+import AddIcon from "@mui/icons-material/Add";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { GET_PROJECTS_QUERY } from "../graphql/queries";
 import { CREATE_PROJECT_MUTATION } from "../graphql/mutations";
+import { useAuth } from "../hooks/useAuth";
 
 const projectSchema = yup.object({
   name: yup.string().min(1).required("Name is required"),
@@ -42,6 +46,7 @@ interface Project {
 
 export function ProjectsPage() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
 
   const { data, loading, error } = useQuery(GET_PROJECTS_QUERY);
@@ -66,7 +71,31 @@ export function ProjectsPage() {
 
   return (
     <>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Projects
+          </Typography>
+          <Typography variant="body2" sx={{ mr: 2 }}>
+            {user?.name}
+          </Typography>
+          <Button color="inherit" startIcon={<LogoutIcon />} onClick={logout}>
+            Logout
+          </Button>
+        </Toolbar>
+      </AppBar>
+
       <Container maxWidth="md" sx={{ mt: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 3 }}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setOpen(true)}
+          >
+            New Project
+          </Button>
+        </Box>
+
         {loading && <CircularProgress />}
         {error && <Alert severity="error">{error.message}</Alert>}
 
