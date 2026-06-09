@@ -4,10 +4,14 @@ import { requireAuth } from "../../middleware/auth.js";
 
 export const invitationResolvers = {
   Query: {
-    invitations: async (_: any, __: any, context: AppContext) => {
+    invitations: async (
+      _: any,
+      { projectId }: { projectId: number },
+      context: AppContext,
+    ) => {
       const userId = requireAuth(context);
       return prisma.invitation.findMany({
-        where: { senderId: userId, status: "PENDING" },
+        where: { senderId: userId, projectId, status: "PENDING" },
         include: { project: true, sender: true },
       });
     },

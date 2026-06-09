@@ -45,3 +45,47 @@ export const GET_PROJECT_QUERY = gql`
     }
   }
 `;
+
+export const GET_INVITATIONS_QUERY = gql`
+  query GetInvitations($projectId: Int!) {
+    invitations(projectId: $projectId) {
+      id
+      projectId
+      invitedEmail
+      status
+      createdAt
+      project {
+        id
+        name
+        location
+      }
+      sender {
+        id
+        name
+        email
+      }
+    }
+  }
+`;
+
+export const GET_RECEIVED_INVITATIONS_QUERY = gql`
+  query GetReceivedInvitations {
+    receivedInvitations {
+      id
+      projectId
+      invitedEmail
+      status
+      createdAt
+      project {
+        id
+        name
+        location
+      }
+      sender {
+        id
+        name
+        email
+      }
+    }
+  }
+`;

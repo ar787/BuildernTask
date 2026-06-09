@@ -19,11 +19,13 @@ import {
   Typography,
   AppBar,
   Toolbar,
+  IconButton,
   CircularProgress,
   Alert,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import LogoutIcon from "@mui/icons-material/Logout";
+import MailIcon from "@mui/icons-material/Mail";
 import { GET_PROJECTS_QUERY } from "../graphql/queries";
 import { CREATE_PROJECT_MUTATION } from "../graphql/mutations";
 import { useAuth } from "../hooks/useAuth";
@@ -79,6 +81,9 @@ export function ProjectsPage() {
           <Typography variant="body2" sx={{ mr: 2 }}>
             {user?.name}
           </Typography>
+          <IconButton color="inherit" onClick={() => navigate("/invitations")}>
+            <MailIcon />
+          </IconButton>
           <Button color="inherit" startIcon={<LogoutIcon />} onClick={logout}>
             Logout
           </Button>

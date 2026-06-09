@@ -55,3 +55,29 @@ export const DELETE_PROJECT_MUTATION = gql`
     deleteProject(id: $id)
   }
 `;
+
+export const RESPOND_INVITATION_MUTATION = gql`
+  mutation RespondToInvitation($id: Int!, $accept: Boolean!) {
+    respondToInvitation(id: $id, accept: $accept) {
+      id
+      status
+    }
+  }
+`;
+
+export const INVITE_USER_MUTATION = gql`
+  mutation InviteUserToProject($projectId: Int!, $email: String!) {
+    inviteUserToProject(projectId: $projectId, email: $email) {
+      id
+      projectId
+      invitedEmail
+      status
+      createdAt
+      sender {
+        id
+        name
+        email
+      }
+    }
+  }
+`;

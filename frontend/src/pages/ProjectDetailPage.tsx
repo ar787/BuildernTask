@@ -28,10 +28,16 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { GET_PROJECT_QUERY, GET_PROJECTS_QUERY } from "../graphql/queries";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import {
+  GET_PROJECT_QUERY,
+  GET_PROJECTS_QUERY,
+  GET_INVITATIONS_QUERY,
+} from "../graphql/queries";
 import {
   UPDATE_PROJECT_MUTATION,
   DELETE_PROJECT_MUTATION,
+  INVITE_USER_MUTATION,
 } from "../graphql/mutations";
 import { useAuth } from "../hooks/useAuth";
 
@@ -40,7 +46,12 @@ const editSchema = yup.object({
   location: yup.string().min(1).required("Location is required"),
 });
 
+const emailSchema = yup.object({
+  email: yup.string().email("Invalid email").required("Email is required"),
+});
+
 type EditFormValues = yup.InferType<typeof editSchema>;
+type EmailFormValues = yup.InferType<typeof emailSchema>;
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -48,15 +59,22 @@ export function ProjectDetailPage() {
   const { user } = useAuth();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-
+  const [inviteOpen, setInviteOpen] = useState(false);
   const projectId = Number(id);
 
   const { data, loading, error } = useQuery(GET_PROJECT_QUERY, {
     variables: { id: projectId },
   });
 
+  const { data: invitationsData, loading: invitationsLoading } = useQuery(
+    GET_INVITATIONS_QUERY,
+    { variables: { projectId } },
+  );
+
   const [updateProject, { loading: updating, error: updateError }] =
     useMutation(UPDATE_PROJECT_MUTATION);
+
+  const [inviteUser, { loading: inviting }] = useMutation(INVITE_USER_MUTATION);
 
   const [deleteProject, { loading: deleting }] = useMutation(
     DELETE_PROJECT_MUTATION,
@@ -73,6 +91,13 @@ export function ProjectDetailPage() {
     formState: { errors },
   } = useForm<EditFormValues>({ resolver: yupResolver(editSchema) });
 
+  const {
+    register: registerEmail,
+    handleSubmit: handleSubmitEmail,
+    reset: resetEmail,
+    formState: { errors: emailErrors },
+  } = useForm<EmailFormValues>({ resolver: yupResolver(emailSchema) });
+
   const project = data?.project;
   const isOwner = project?.ownerId === user?.id;
 
@@ -88,6 +113,12 @@ export function ProjectDetailPage() {
 
   const handleDelete = async () => {
     await deleteProject({ variables: { id: projectId } });
+  };
+
+  const handleInvite = async (values: EmailFormValues) => {
+    await inviteUser({ variables: { projectId, email: values.email } });
+    resetEmail();
+    setInviteOpen(false);
   };
 
   if (loading) return <CircularProgress sx={{ m: 4 }} />;
@@ -115,6 +146,9 @@ export function ProjectDetailPage() {
           </Typography>
           {isOwner && (
             <>
+              <IconButton color="inherit" onClick={() => setInviteOpen(true)}>
+                <PersonAddIcon />
+              </IconButton>
               <IconButton color="inherit" onClick={handleEdit}>
                 <EditIcon />
               </IconButton>
@@ -134,6 +168,38 @@ export function ProjectDetailPage() {
           <strong>Owner:</strong> {project.owner.name} ({project.owner.email})
         </Typography>
         {!isOwner && <Chip label="Member" size="small" sx={{ mt: 1 }} />}
+
+        {isOwner && (
+          <>
+            <Typography variant="h6" sx={{ mt: 4, mb: 1 }}>
+              Sent Invitations
+            </Typography>
+            {invitationsLoading ? (
+              <CircularProgress />
+            ) : invitationsData?.invitations.length === 0 ? (
+              <Typography color="text.secondary">
+                No pending invitations.
+              </Typography>
+            ) : (
+              <List dense>
+                {invitationsData.invitations.map(
+                    (inv: {
+                      id: number;
+                      invitedEmail: string;
+                      createdAt: string;
+                    }) => (
+                      <ListItem key={inv.id}>
+                        <ListItemText
+                          primary={inv.invitedEmail}
+                          secondary={`Pending · Sent ${new Date(inv.createdAt).toLocaleDateString()}`}
+                        />
+                      </ListItem>
+                    ),
+                  )}
+              </List>
+            )}
+          </>
+        )}
 
         <Typography variant="h6" sx={{ mt: 4, mb: 1 }}>
           Members
@@ -210,6 +276,35 @@ export function ProjectDetailPage() {
           <Button onClick={() => setDeleteOpen(false)}>Cancel</Button>
           <Button color="error" onClick={handleDelete} disabled={deleting}>
             {deleting ? "Deleting…" : "Delete"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Invite user dialog */}
+      <Dialog open={inviteOpen} onClose={() => setInviteOpen(false)}>
+        <DialogTitle>Invite User</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Enter the email of the user you want to invite to this project.
+          </DialogContentText>
+          <TextField
+            label="Email"
+            type="email"
+            fullWidth
+            margin="dense"
+            {...registerEmail("email")}
+            error={!!emailErrors.email}
+            helperText={emailErrors.email?.message}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setInviteOpen(false)}>Cancel</Button>
+          <Button
+            color="primary"
+            onClick={handleSubmitEmail(handleInvite)}
+            disabled={inviting}
+          >
+            {inviting ? "Inviting…" : "Invite"}
           </Button>
         </DialogActions>
       </Dialog>

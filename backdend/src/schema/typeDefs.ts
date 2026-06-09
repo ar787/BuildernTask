@@ -46,7 +46,7 @@ export const typeDefs = `#graphql
     me: User
     projects: [Project!]!
     project(id: Int!): Project
-    invitations: [Invitation!]!
+    invitations(projectId: Int!): [Invitation!]!
     receivedInvitations: [Invitation!]!
   }
 
