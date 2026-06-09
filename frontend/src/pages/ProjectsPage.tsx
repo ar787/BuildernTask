@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@apollo/client/react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -26,8 +25,6 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MailIcon from "@mui/icons-material/Mail";
-import { GET_PROJECTS_QUERY } from "../graphql/queries";
-import { CREATE_PROJECT_MUTATION } from "../graphql/mutations";
 import { useAuth } from "../hooks/useAuth";
 
 const projectSchema = yup.object({
@@ -37,26 +34,33 @@ const projectSchema = yup.object({
 
 type ProjectFormValues = yup.InferType<typeof projectSchema>;
 
-interface Project {
+type Project = {
   id: number;
   name: string;
   location: string;
   ownerId: number;
   owner: { id: number; name: string };
   createdAt: string;
-}
+};
 
-export function ProjectsPage() {
+type ProjectsPageProps = {
+  projects: Project[];
+  loading: boolean;
+  error?: string;
+  onCreate: (values: { name: string; location: string }) => Promise<void>;
+};
+
+export function ProjectsPage({
+  projects,
+  loading,
+  error,
+  onCreate,
+}: Readonly<ProjectsPageProps>) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
-
-  const { data, loading, error } = useQuery(GET_PROJECTS_QUERY);
-
-  const [createProject, { loading: creating, error: createError }] =
-    useMutation(CREATE_PROJECT_MUTATION, {
-      refetchQueries: [GET_PROJECTS_QUERY],
-    });
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string>();
 
   const {
     register,
@@ -66,9 +70,17 @@ export function ProjectsPage() {
   } = useForm<ProjectFormValues>({ resolver: yupResolver(projectSchema) });
 
   const handleCreate = async (values: ProjectFormValues) => {
-    await createProject({ variables: values });
-    reset();
-    setOpen(false);
+    setCreateError(undefined);
+    setCreating(true);
+    try {
+      await onCreate(values);
+      reset();
+      setOpen(false);
+    } catch (e) {
+      setCreateError(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setCreating(false);
+    }
   };
 
   const handleLogout = () => {
@@ -111,7 +123,7 @@ export function ProjectsPage() {
         </Box>
 
         {loading && <CircularProgress />}
-        {error && <Alert severity="error">{error.message}</Alert>}
+        {error && <Alert severity="error">{error}</Alert>}
 
         <Box
           sx={{
@@ -120,7 +132,7 @@ export function ProjectsPage() {
             gap: 2,
           }}
         >
-          {data?.projects.map((project: Project) => (
+          {projects.map((project) => (
             <Card key={project.id}>
               <CardActionArea
                 onClick={() => navigate(`/projects/${project.id}`)}
@@ -139,8 +151,11 @@ export function ProjectsPage() {
           ))}
         </Box>
 
-        {data?.projects.length === 0 && !loading && (
-          <Typography color="text.secondary" textAlign="center" mt={6}>
+        {projects.length === 0 && !loading && (
+          <Typography
+            color="text.secondary"
+            sx={{ textAlign: "center", mt: 6 }}
+          >
             No projects yet. Create your first one!
           </Typography>
         )}
@@ -157,7 +172,7 @@ export function ProjectsPage() {
           <DialogContent>
             {createError && (
               <Alert severity="error" sx={{ mb: 2 }}>
-                {createError.message}
+                {createError}
               </Alert>
             )}
             <TextField

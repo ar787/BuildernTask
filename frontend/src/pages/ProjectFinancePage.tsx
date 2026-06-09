@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation } from "@apollo/client/react";
+import { useNavigate } from "react-router-dom";
 import {
   AppBar,
   Box,
@@ -22,20 +21,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {
-  GET_EXPENSES_QUERY,
-  GET_INCOMES_QUERY,
-  GET_PROJECT_QUERY,
-} from "../graphql/queries";
 import { useAuth } from "../hooks/useAuth";
-import {
-  CREATE_EXPENSE_MUTATION,
-  UPDATE_EXPENSE_MUTATION,
-  DELETE_EXPENSE_MUTATION,
-  CREATE_INCOME_MUTATION,
-  UPDATE_INCOME_MUTATION,
-  DELETE_INCOME_MUTATION,
-} from "../graphql/mutations";
 import { FinanceEntryDialog } from "../components/FinanceEntryDialog";
 
 type Entry = {
@@ -51,77 +37,55 @@ type DialogState =
   | { open: false }
   | { open: true; type: "expense" | "income"; entry?: Entry };
 
-export function ProjectFinancePage() {
-  const { id } = useParams<{ id: string }>();
+type ProjectFinancePageProps = {
+  projectId: number;
+  ownerId: number | undefined;
+  expenses: Entry[];
+  incomes: Entry[];
+  loading: boolean;
+  error?: string;
+  onCreateExpense: (v: { name: string; amount: number }) => Promise<unknown>;
+  onUpdateExpense: (
+    id: number,
+    v: { name?: string; amount?: number },
+  ) => Promise<unknown>;
+  onDeleteExpense: (id: number) => Promise<unknown>;
+  onCreateIncome: (v: { name: string; amount: number }) => Promise<unknown>;
+  onUpdateIncome: (
+    id: number,
+    v: { name?: string; amount?: number },
+  ) => Promise<unknown>;
+  onDeleteIncome: (id: number) => Promise<unknown>;
+};
+
+export function ProjectFinancePage({
+  projectId,
+  ownerId,
+  expenses,
+  incomes,
+  loading,
+  error,
+  onCreateExpense,
+  onUpdateExpense,
+  onDeleteExpense,
+  onCreateIncome,
+  onUpdateIncome,
+  onDeleteIncome,
+}: Readonly<ProjectFinancePageProps>) {
   const navigate = useNavigate();
-  const projectId = Number(id);
   const { user } = useAuth();
 
   const [tab, setTab] = useState<0 | 1>(0);
   const [dialog, setDialog] = useState<DialogState>({ open: false });
   const [mutationError, setMutationError] = useState<string | undefined>();
-
-  const { data: projectData } = useQuery(GET_PROJECT_QUERY, {
-    variables: { id: projectId },
-  });
-
-  const ownerId = (projectData as { project?: { ownerId: number } })?.project
-    ?.ownerId;
-  const canModify = (entry: Entry) => {
-    return user?.id === entry.userId || user?.id === ownerId;
-  };
-
-  const {
-    data: expenseData,
-    loading: expensesLoading,
-    error: expensesError,
-  } = useQuery(GET_EXPENSES_QUERY, { variables: { projectId } });
-
-  const {
-    data: incomeData,
-    loading: incomesLoading,
-    error: incomesError,
-  } = useQuery(GET_INCOMES_QUERY, { variables: { projectId } });
-
-  const [createExpense, { loading: creatingExpense }] = useMutation(
-    CREATE_EXPENSE_MUTATION,
-    {
-      refetchQueries: [{ query: GET_EXPENSES_QUERY, variables: { projectId } }],
-    },
-  );
-  const [updateExpense, { loading: updatingExpense }] = useMutation(
-    UPDATE_EXPENSE_MUTATION,
-    {
-      refetchQueries: [{ query: GET_EXPENSES_QUERY, variables: { projectId } }],
-    },
-  );
-  const [deleteExpense] = useMutation(DELETE_EXPENSE_MUTATION, {
-    refetchQueries: [{ query: GET_EXPENSES_QUERY, variables: { projectId } }],
-  });
-
-  const [createIncome, { loading: creatingIncome }] = useMutation(
-    CREATE_INCOME_MUTATION,
-    {
-      refetchQueries: [{ query: GET_INCOMES_QUERY, variables: { projectId } }],
-    },
-  );
-  const [updateIncome, { loading: updatingIncome }] = useMutation(
-    UPDATE_INCOME_MUTATION,
-    {
-      refetchQueries: [{ query: GET_INCOMES_QUERY, variables: { projectId } }],
-    },
-  );
-  const [deleteIncome] = useMutation(DELETE_INCOME_MUTATION, {
-    refetchQueries: [{ query: GET_INCOMES_QUERY, variables: { projectId } }],
-  });
+  const [mutating, setMutating] = useState(false);
 
   const isExpenseTab = tab === 0;
-  const entries: Entry[] = isExpenseTab
-    ? (expenseData?.expenses ?? [])
-    : (incomeData?.incomes ?? []);
+  const entries: Entry[] = isExpenseTab ? expenses : incomes;
   const total = entries.reduce((sum, e) => sum + e.amount, 0);
-  const isMutating =
-    creatingExpense || updatingExpense || creatingIncome || updatingIncome;
+
+  const canModify = (entry: Entry) =>
+    user?.id === entry.userId || user?.id === ownerId;
 
   const openAdd = () => {
     setMutationError(undefined);
@@ -130,49 +94,39 @@ export function ProjectFinancePage() {
 
   const openEdit = (entry: Entry) => {
     setMutationError(undefined);
-    setDialog({
-      open: true,
-      type: isExpenseTab ? "expense" : "income",
-      entry,
-    });
+    setDialog({ open: true, type: isExpenseTab ? "expense" : "income", entry });
   };
 
   const handleSubmit = async (values: { name: string; amount: number }) => {
     if (!dialog.open) return;
+    setMutating(true);
     try {
       if (dialog.entry) {
         if (isExpenseTab) {
-          await updateExpense({
-            variables: { id: dialog.entry.id, ...values },
-          });
+          await onUpdateExpense(dialog.entry.id, values);
         } else {
-          await updateIncome({ variables: { id: dialog.entry.id, ...values } });
+          await onUpdateIncome(dialog.entry.id, values);
         }
-        setDialog({ open: false });
-        return;
-      }
-      if (isExpenseTab) {
-        await createExpense({ variables: { projectId, ...values } });
+      } else if (isExpenseTab) {
+        await onCreateExpense(values);
       } else {
-        await createIncome({ variables: { projectId, ...values } });
+        await onCreateIncome(values);
       }
-
       setDialog({ open: false });
     } catch (e: unknown) {
       setMutationError(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setMutating(false);
     }
   };
 
   const handleDelete = async (entry: Entry) => {
     if (isExpenseTab) {
-      await deleteExpense({ variables: { id: entry.id } });
+      await onDeleteExpense(entry.id);
     } else {
-      await deleteIncome({ variables: { id: entry.id } });
+      await onDeleteIncome(entry.id);
     }
   };
-
-  const loading = expensesLoading || incomesLoading;
-  const queryError = expensesError || incomesError;
 
   return (
     <>
@@ -201,10 +155,13 @@ export function ProjectFinancePage() {
         </Tabs>
 
         {loading && <CircularProgress />}
-        {queryError && <Alert severity="error">{queryError.message}</Alert>}
+        {error && <Alert severity="error">{error}</Alert>}
 
         {!loading && entries.length === 0 ? (
-          <Typography color="text.secondary" textAlign="center" mt={6}>
+          <Typography
+            color="text.secondary"
+            sx={{ textAlign: "center", mt: 6 }}
+          >
             No {isExpenseTab ? "expenses" : "incomes"} yet.
           </Typography>
         ) : (
@@ -276,7 +233,7 @@ export function ProjectFinancePage() {
               ? { name: dialog.entry.name, amount: dialog.entry.amount }
               : undefined
           }
-          loading={isMutating}
+          loading={mutating}
           error={mutationError}
           onClose={() => setDialog({ open: false })}
           onSubmit={handleSubmit}

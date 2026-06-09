@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@apollo/client/react";
+import { useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -15,42 +14,79 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
-import { SentInvitationsList } from "../components/SentInvitationsList";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
-import { GET_PROJECT_QUERY } from "../graphql/queries";
 import { useAuth } from "../hooks/useAuth";
 import { EditProjectDialog } from "../components/EditProjectDialog";
 import { DeleteProjectDialog } from "../components/DeleteProjectDialog";
 import { InviteUserDialog } from "../components/InviteUserDialog";
+import { SentInvitationsList } from "../components/SentInvitationsList";
 
-export function ProjectDetailPage() {
-  const { id } = useParams<{ id: string }>();
+type Member = {
+  id: number;
+  user: { name: string; email: string };
+};
+
+type Project = {
+  id: number;
+  name: string;
+  location: string;
+  ownerId: number;
+  owner: { id: number; name: string; email: string };
+  members: Member[];
+};
+
+type Invitation = {
+  id: number;
+  invitedEmail: string;
+  createdAt: string;
+};
+
+type ProjectDetailPageProps = {
+  project: Project | undefined;
+  loading: boolean;
+  error?: string;
+  invitations: Invitation[];
+  invitationsLoading: boolean;
+  onUpdate: (values: { name?: string; location?: string }) => Promise<void>;
+  onDelete: () => Promise<void>;
+  onInvite: (email: string) => Promise<void>;
+};
+
+export function ProjectDetailPage({
+  project,
+  loading,
+  error,
+  invitations,
+  invitationsLoading,
+  onUpdate,
+  onDelete,
+  onInvite,
+}: Readonly<ProjectDetailPageProps>) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
-  const projectId = Number(id);
 
-  const { data, loading, error } = useQuery(GET_PROJECT_QUERY, {
-    variables: { id: projectId },
-  });
-
-  const project = data?.project;
   const isOwner = project?.ownerId === user?.id;
 
   if (loading) return <CircularProgress sx={{ m: 4 }} />;
   if (error)
     return (
       <Alert severity="error" sx={{ m: 4 }}>
-        {error.message}
+        {error}
       </Alert>
     );
   if (!project) return null;
+
+  const handleDelete = async () => {
+    await onDelete();
+    navigate("/projects");
+  };
 
   return (
     <>
@@ -68,7 +104,7 @@ export function ProjectDetailPage() {
           </Typography>
           <Button
             color="inherit"
-            onClick={() => navigate(`/projects/${projectId}/finance`)}
+            onClick={() => navigate(`/projects/${project.id}/finance`)}
             startIcon={<MonetizationOnIcon />}
           >
             Finance
@@ -103,7 +139,10 @@ export function ProjectDetailPage() {
             <Typography variant="h6" sx={{ mt: 4, mb: 1 }}>
               Sent Invitations
             </Typography>
-            <SentInvitationsList projectId={projectId} />
+            <SentInvitationsList
+              invitations={invitations}
+              loading={invitationsLoading}
+            />
           </>
         )}
 
@@ -114,16 +153,11 @@ export function ProjectDetailPage() {
           <Typography color="text.secondary">No members yet.</Typography>
         ) : (
           <List dense>
-            {project.members.map(
-              (m: { id: number; user: { name: string; email: string } }) => (
-                <ListItem key={m.id}>
-                  <ListItemText
-                    primary={m.user.name}
-                    secondary={m.user.email}
-                  />
-                </ListItem>
-              ),
-            )}
+            {project.members.map((m) => (
+              <ListItem key={m.id}>
+                <ListItemText primary={m.user.name} secondary={m.user.email} />
+              </ListItem>
+            ))}
           </List>
         )}
       </Container>
@@ -132,17 +166,18 @@ export function ProjectDetailPage() {
         open={editOpen}
         onClose={() => setEditOpen(false)}
         project={project}
+        onSubmit={onUpdate}
       />
       <DeleteProjectDialog
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
-        projectId={projectId}
         projectName={project.name}
+        onDelete={handleDelete}
       />
       <InviteUserDialog
         open={inviteOpen}
         onClose={() => setInviteOpen(false)}
-        projectId={projectId}
+        onInvite={onInvite}
       />
     </>
   );

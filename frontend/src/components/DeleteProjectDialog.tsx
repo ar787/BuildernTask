@@ -1,5 +1,4 @@
-import { useMutation } from "@apollo/client/react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import {
   Button,
   Dialog,
@@ -8,31 +7,29 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { DELETE_PROJECT_MUTATION } from "../graphql/mutations";
-import { GET_PROJECTS_QUERY } from "../graphql/queries";
 
-interface Props {
+type DeleteProjectDialogProps = {
   open: boolean;
   onClose: () => void;
-  projectId: number;
   projectName: string;
-}
+  onDelete: () => Promise<void>;
+};
 
 export function DeleteProjectDialog({
   open,
   onClose,
-  projectId,
   projectName,
-}: Props) {
-  const navigate = useNavigate();
-
-  const [deleteProject, { loading }] = useMutation(DELETE_PROJECT_MUTATION, {
-    refetchQueries: [GET_PROJECTS_QUERY],
-    onCompleted: () => navigate("/projects"),
-  });
+  onDelete,
+}: Readonly<DeleteProjectDialogProps>) {
+  const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
-    await deleteProject({ variables: { id: projectId } });
+    setDeleting(true);
+    try {
+      await onDelete();
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -46,8 +43,8 @@ export function DeleteProjectDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button color="error" onClick={handleDelete} disabled={loading}>
-          {loading ? "Deleting…" : "Delete"}
+        <Button color="error" onClick={handleDelete} disabled={deleting}>
+          {deleting ? "Deleting…" : "Delete"}
         </Button>
       </DialogActions>
     </Dialog>

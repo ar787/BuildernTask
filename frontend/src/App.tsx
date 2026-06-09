@@ -2,10 +2,10 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthGuard } from "./components/AuthGuard";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
-import { ProjectsPage } from "./pages/ProjectsPage";
-import { ProjectDetailPage } from "./pages/ProjectDetailPage";
-import { InvitationsPage } from "./pages/InvitationsPage";
-import { ProjectFinancePage } from "./pages/ProjectFinancePage";
+import { ProjectsContainer } from "./containers/ProjectsContainer";
+import { ProjectDetailContainer } from "./containers/ProjectDetailContainer";
+import { ProjectFinanceContainer } from "./containers/ProjectFinanceContainer";
+import { InvitationsContainer } from "./containers/InvitationsContainer";
 
 export default function App() {
   return (
@@ -13,10 +13,10 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route element={<AuthGuard />}>
-        <Route path="/projects" element={<ProjectsPage />} />
-        <Route path="/projects/:id" element={<ProjectDetailPage />} />
-        <Route path="/projects/:id/finance" element={<ProjectFinancePage />} />
-        <Route path="/invitations" element={<InvitationsPage />} />
+        <Route path="/projects" element={<ProjectsContainer />} />
+        <Route path="/projects/:id" element={<ProjectDetailContainer />} />
+        <Route path="/projects/:id/finance" element={<ProjectFinanceContainer />} />
+        <Route path="/invitations" element={<InvitationsContainer />} />
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>

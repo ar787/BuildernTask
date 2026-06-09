@@ -38,7 +38,8 @@ export function LoginPage() {
   const [loginMutation, { loading, error }] = useMutation(LOGIN_MUTATION);
 
   const onSubmit = async (values: FormValues) => {
-    const { data } = await loginMutation({ variables: values });
+    const result = await loginMutation({ variables: values });
+    const data = result.data as { login: { token: string; user: { id: number; name: string; email: string } } };
     login(data.login.token, data.login.user);
     navigate("/projects");
   };
@@ -47,7 +48,7 @@ export function LoginPage() {
     <Container maxWidth="xs">
       <Box sx={{ mt: 8 }}>
         <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h5" fontWeight={600} gutterBottom>
+          <Typography variant="h5" sx={{ fontWeight: 600 }} gutterBottom>
             Sign in
           </Typography>
           {error && (

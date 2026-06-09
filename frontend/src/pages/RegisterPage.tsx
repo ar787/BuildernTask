@@ -39,7 +39,8 @@ export function RegisterPage() {
   const [registerMutation, { loading, error }] = useMutation(REGISTER_MUTATION);
 
   const onSubmit = async (values: FormValues) => {
-    const { data } = await registerMutation({ variables: values });
+    const result = await registerMutation({ variables: values });
+    const data = result.data as { register: { token: string; user: { id: number; name: string; email: string } } };
     login(data.register.token, data.register.user);
     navigate("/projects");
   };
@@ -48,7 +49,7 @@ export function RegisterPage() {
     <Container maxWidth="xs">
       <Box sx={{ mt: 8 }}>
         <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h5" fontWeight={600} gutterBottom>
+          <Typography variant="h5" sx={{ fontWeight: 600 }} gutterBottom>
             Create account
           </Typography>
           {error && (

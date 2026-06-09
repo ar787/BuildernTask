@@ -23,7 +23,7 @@ const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-interface Props {
+type FinanceEntryDialogProps = {
   open: boolean;
   onClose: () => void;
   onSubmit: (values: { name: string; amount: number }) => Promise<void>;
@@ -31,7 +31,7 @@ interface Props {
   loading?: boolean;
   error?: string;
   initial?: { name: string; amount: number };
-}
+};
 
 export function FinanceEntryDialog({
   open,
@@ -41,7 +41,7 @@ export function FinanceEntryDialog({
   loading,
   error,
   initial,
-}: Props) {
+}: Readonly<FinanceEntryDialogProps>) {
   const isEdit = !!initial;
   const label = type === "expense" ? "Expense" : "Income";
 
@@ -84,7 +84,7 @@ export function FinanceEntryDialog({
             type="number"
             fullWidth
             margin="dense"
-            inputProps={{ step: "0.01", min: "0" }}
+            slotProps={{ htmlInput: { step: "0.01", min: "0" } }}
             {...register("amount")}
             error={!!errors.amount}
             helperText={errors.amount?.message}

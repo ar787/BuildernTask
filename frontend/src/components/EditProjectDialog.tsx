@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/client/react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -12,7 +12,6 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import { UPDATE_PROJECT_MUTATION } from "../graphql/mutations";
 
 const schema = yup.object({
   name: yup.string().min(1).required("Name is required"),
@@ -21,16 +20,21 @@ const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-interface Props {
+type EditProjectDialogProps = {
   open: boolean;
   onClose: () => void;
-  project: { id: number; name: string; location: string };
-}
+  project: { name: string; location: string };
+  onSubmit: (values: { name?: string; location?: string }) => Promise<void>;
+};
 
-export function EditProjectDialog({ open, onClose, project }: Props) {
-  const [updateProject, { loading, error }] = useMutation(
-    UPDATE_PROJECT_MUTATION,
-  );
+export function EditProjectDialog({
+  open,
+  onClose,
+  project,
+  onSubmit,
+}: Readonly<EditProjectDialogProps>) {
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string>();
 
   const {
     register,
@@ -42,8 +46,16 @@ export function EditProjectDialog({ open, onClose, project }: Props) {
   });
 
   const handleUpdate = async (values: FormValues) => {
-    await updateProject({ variables: { id: project.id, ...values } });
-    onClose();
+    setError(undefined);
+    setSaving(true);
+    try {
+      await onSubmit(values);
+      onClose();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -53,7 +65,7 @@ export function EditProjectDialog({ open, onClose, project }: Props) {
         <DialogContent>
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
-              {error.message}
+              {error}
             </Alert>
           )}
           <TextField
@@ -75,8 +87,8 @@ export function EditProjectDialog({ open, onClose, project }: Props) {
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
-          <Button type="submit" variant="contained" disabled={loading}>
-            {loading ? "Saving…" : "Save"}
+          <Button type="submit" variant="contained" disabled={saving}>
+            {saving ? "Saving…" : "Save"}
           </Button>
         </DialogActions>
       </Box>

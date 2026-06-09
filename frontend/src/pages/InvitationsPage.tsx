@@ -1,5 +1,5 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery, useMutation } from "@apollo/client/react";
 import {
   AppBar,
   Toolbar,
@@ -15,10 +15,8 @@ import {
   Alert,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { GET_RECEIVED_INVITATIONS_QUERY } from "../graphql/queries";
-import { RESPOND_INVITATION_MUTATION } from "../graphql/mutations";
 
-interface Invitation {
+type Invitation = {
   id: number;
   projectId: number;
   invitedEmail: string;
@@ -26,20 +24,31 @@ interface Invitation {
   createdAt: string;
   project: { id: number; name: string; location: string };
   sender: { id: number; name: string; email: string };
-}
+};
 
-export function InvitationsPage() {
+type InvitationsPageProps = {
+  invitations: Invitation[];
+  loading: boolean;
+  error?: string;
+  onRespond: (id: number, accept: boolean) => Promise<void>;
+};
+
+export function InvitationsPage({
+  invitations,
+  loading,
+  error,
+  onRespond,
+}: Readonly<InvitationsPageProps>) {
   const navigate = useNavigate();
-
-  const { data, loading, error } = useQuery(GET_RECEIVED_INVITATIONS_QUERY);
-
-  const [respondToInvitation, { loading: responding }] = useMutation(
-    RESPOND_INVITATION_MUTATION,
-    { refetchQueries: [GET_RECEIVED_INVITATIONS_QUERY] },
-  );
+  const [responding, setResponding] = useState(false);
 
   const handleRespond = async (id: number, accept: boolean) => {
-    await respondToInvitation({ variables: { id, accept } });
+    setResponding(true);
+    try {
+      await onRespond(id, accept);
+    } finally {
+      setResponding(false);
+    }
   };
 
   return (
@@ -61,16 +70,19 @@ export function InvitationsPage() {
 
       <Container maxWidth="sm" sx={{ mt: 4 }}>
         {loading && <CircularProgress />}
-        {error && <Alert severity="error">{error.message}</Alert>}
+        {error && <Alert severity="error">{error}</Alert>}
 
-        {!loading && data?.receivedInvitations.length === 0 && (
-          <Typography color="text.secondary" textAlign="center" mt={6}>
+        {!loading && invitations.length === 0 && (
+          <Typography
+            color="text.secondary"
+            sx={{ textAlign: "center", mt: 6 }}
+          >
             No pending invitations.
           </Typography>
         )}
 
         <List>
-          {data?.receivedInvitations.map((inv: Invitation) => (
+          {invitations.map((inv) => (
             <ListItem
               key={inv.id}
               secondaryAction={
