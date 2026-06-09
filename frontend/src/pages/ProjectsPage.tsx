@@ -71,6 +71,11 @@ export function ProjectsPage() {
     setOpen(false);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <>
       <AppBar position="static">
@@ -84,7 +89,11 @@ export function ProjectsPage() {
           <IconButton color="inherit" onClick={() => navigate("/invitations")}>
             <MailIcon />
           </IconButton>
-          <Button color="inherit" startIcon={<LogoutIcon />} onClick={logout}>
+          <Button
+            color="inherit"
+            startIcon={<LogoutIcon />}
+            onClick={handleLogout}
+          >
             Logout
           </Button>
         </Toolbar>
