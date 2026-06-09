@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ownedProjects       Project[]       @relation("ProjectOwner")
+  sentInvitations     Invitation[]    @relation("InvitationSender")
+  receivedInvitations Invitation[]    @relation("InvitationReceiver")
+  expenses            Expense[]
+  incomes             Income[]
+  projectMembers      ProjectMember[]
+
+  @@index([email])
+}
+
+model Project {
+  id        Int      @id @default(autoincrement())
+  name      String
+  location  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ownerId Int
+  owner   User @relation("ProjectOwner", fields: [ownerId], references: [id])
+
+  members     ProjectMember[]
+  invitations Invitation[]
+  expenses    Expense[]
+  incomes     Income[]
+}
+
+model ProjectMember {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  projectId Int
+  joinedAt  DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model Invitation {
+  id            Int              @id @default(autoincrement())
+  projectId     Int
+  invitedEmail  String
+  invitedUserId Int?
+  senderId      Int
+  status        InvitationStatus @default(PENDING)
+  createdAt     DateTime         @default(now())
+
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  invitedUser User?   @relation("InvitationReceiver", fields: [invitedUserId], references: [id])
+  sender      User    @relation("InvitationSender", fields: [senderId], references: [id])
+}
+
+model Expense {
+  id        Int      @id @default(autoincrement())
+  name      String
+  amount    Float
+  userId    Int
+  projectId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id])
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Income {
+  id        Int      @id @default(autoincrement())
+  name      String
+  amount    Float
+  userId    Int
+  projectId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id])
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
