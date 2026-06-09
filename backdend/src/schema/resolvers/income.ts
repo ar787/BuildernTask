@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
 import prisma from "../../db.js";
-import { requireAuth, requireProjectAccess } from "../../middleware/auth.js";
+import { requireAuth, requireProjectAccess, requireCreatorOrOwner } from "../../middleware/auth.js";
 import type { AppContext } from "../../context.js";
 
 const include = { user: true } as const;
@@ -52,7 +52,7 @@ export const incomeResolvers = {
           extensions: { code: "NOT_FOUND" },
         });
       }
-      await requireProjectAccess(income.projectId, userId);
+      await requireCreatorOrOwner(income.userId, income.projectId, userId);
       return prisma.income.update({
         where: { id },
         data: {
@@ -75,7 +75,7 @@ export const incomeResolvers = {
           extensions: { code: "NOT_FOUND" },
         });
       }
-      await requireProjectAccess(income.projectId, userId);
+      await requireCreatorOrOwner(income.userId, income.projectId, userId);
       await prisma.income.delete({ where: { id } });
       return true;
     },

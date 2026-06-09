@@ -22,7 +22,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { GET_EXPENSES_QUERY, GET_INCOMES_QUERY } from "../graphql/queries";
+import { GET_EXPENSES_QUERY, GET_INCOMES_QUERY, GET_PROJECT_QUERY } from "../graphql/queries";
+import { useAuth } from "../hooks/useAuth";
 import {
   CREATE_EXPENSE_MUTATION,
   UPDATE_EXPENSE_MUTATION,
@@ -50,10 +51,19 @@ export function ProjectFinancePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const projectId = Number(id);
+  const { user } = useAuth();
 
   const [tab, setTab] = useState<0 | 1>(0);
   const [dialog, setDialog] = useState<DialogState>({ open: false });
   const [mutationError, setMutationError] = useState<string | undefined>();
+
+  const { data: projectData } = useQuery(GET_PROJECT_QUERY, {
+    variables: { id: projectId },
+  });
+
+  const ownerId = (projectData as { project?: { ownerId: number } })?.project?.ownerId;
+  const canModify = (entry: Entry) =>
+    user?.id === entry.userId || user?.id === ownerId;
 
   const {
     data: expenseData,
@@ -197,18 +207,20 @@ export function ProjectFinancePage() {
               <ListItem
                 key={entry.id}
                 secondaryAction={
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    <IconButton size="small" onClick={() => openEdit(entry)}>
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => handleDelete(entry)}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
+                  canModify(entry) ? (
+                    <Box sx={{ display: "flex", gap: 1 }}>
+                      <IconButton size="small" onClick={() => openEdit(entry)}>
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDelete(entry)}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  ) : undefined
                 }
               >
                 <ListItemText

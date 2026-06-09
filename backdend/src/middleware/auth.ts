@@ -19,6 +19,19 @@ export function requireOwnership(ownerId: number, userId: number, resource = "re
   }
 }
 
+export async function requireCreatorOrOwner(
+  resourceUserId: number,
+  projectId: number,
+  userId: number,
+): Promise<void> {
+  if (resourceUserId === userId) return;
+  const project = await prisma.project.findUnique({ where: { id: projectId } });
+  if (project?.ownerId === userId) return;
+  throw new GraphQLError("Only the creator or project owner can perform this action", {
+    extensions: { code: "FORBIDDEN" },
+  });
+}
+
 export async function requireProjectAccess(projectId: number, userId: number): Promise<void> {
   const project = await prisma.project.findFirst({
     where: {
