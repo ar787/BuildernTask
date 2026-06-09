@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
-
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -8,6 +8,7 @@ import {
   Box,
   Button,
   Card,
+  CardActionArea,
   CardContent,
   Container,
   Dialog,
@@ -40,6 +41,7 @@ interface Project {
 }
 
 export function ProjectsPage() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   const { data, loading, error } = useQuery(GET_PROJECTS_QUERY);
@@ -77,15 +79,19 @@ export function ProjectsPage() {
         >
           {data?.projects.map((project: Project) => (
             <Card key={project.id}>
-              <CardContent>
-                <Typography variant="h6">{project.name}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {project.location}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Owner: {project.owner.name}
-                </Typography>
-              </CardContent>
+              <CardActionArea
+                onClick={() => navigate(`/projects/${project.id}`)}
+              >
+                <CardContent>
+                  <Typography variant="h6">{project.name}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {project.location}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Owner: {project.owner.name}
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
             </Card>
           ))}
         </Box>
