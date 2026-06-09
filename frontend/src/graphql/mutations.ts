@@ -65,6 +65,66 @@ export const RESPOND_INVITATION_MUTATION = gql`
   }
 `;
 
+export const CREATE_EXPENSE_MUTATION = gql`
+  mutation CreateExpense($projectId: Int!, $name: String!, $amount: Float!) {
+    createExpense(projectId: $projectId, name: $name, amount: $amount) {
+      id
+      name
+      amount
+      userId
+      createdAt
+      user { id name }
+    }
+  }
+`;
+
+export const UPDATE_EXPENSE_MUTATION = gql`
+  mutation UpdateExpense($id: Int!, $name: String, $amount: Float) {
+    updateExpense(id: $id, name: $name, amount: $amount) {
+      id
+      name
+      amount
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_EXPENSE_MUTATION = gql`
+  mutation DeleteExpense($id: Int!) {
+    deleteExpense(id: $id)
+  }
+`;
+
+export const CREATE_INCOME_MUTATION = gql`
+  mutation CreateIncome($projectId: Int!, $name: String!, $amount: Float!) {
+    createIncome(projectId: $projectId, name: $name, amount: $amount) {
+      id
+      name
+      amount
+      userId
+      createdAt
+      user { id name }
+    }
+  }
+`;
+
+export const UPDATE_INCOME_MUTATION = gql`
+  mutation UpdateIncome($id: Int!, $name: String, $amount: Float) {
+    updateIncome(id: $id, name: $name, amount: $amount) {
+      id
+      name
+      amount
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_INCOME_MUTATION = gql`
+  mutation DeleteIncome($id: Int!) {
+    deleteIncome(id: $id)
+  }
+`;
+
 export const INVITE_USER_MUTATION = gql`
   mutation InviteUserToProject($projectId: Int!, $email: String!) {
     inviteUserToProject(projectId: $projectId, email: $email) {

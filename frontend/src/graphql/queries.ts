@@ -68,6 +68,38 @@ export const GET_INVITATIONS_QUERY = gql`
   }
 `;
 
+export const GET_EXPENSES_QUERY = gql`
+  query GetExpenses($projectId: Int!) {
+    expenses(projectId: $projectId) {
+      id
+      name
+      amount
+      userId
+      createdAt
+      user {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const GET_INCOMES_QUERY = gql`
+  query GetIncomes($projectId: Int!) {
+    incomes(projectId: $projectId) {
+      id
+      name
+      amount
+      userId
+      createdAt
+      user {
+        id
+        name
+      }
+    }
+  }
+`;
+
 export const GET_RECEIVED_INVITATIONS_QUERY = gql`
   query GetReceivedInvitations {
     receivedInvitations {

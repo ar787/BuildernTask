@@ -9,6 +9,7 @@ import {
   IconButton,
   Typography,
   Alert,
+  Button,
   Chip,
   List,
   ListItem,
@@ -19,6 +20,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import { GET_PROJECT_QUERY } from "../graphql/queries";
 import { useAuth } from "../hooks/useAuth";
 import { EditProjectDialog } from "../components/EditProjectDialog";
@@ -64,6 +66,13 @@ export function ProjectDetailPage() {
           <Typography variant="h6" sx={{ flexGrow: 1, ml: 1 }}>
             {project.name}
           </Typography>
+          <Button
+            color="inherit"
+            onClick={() => navigate(`/projects/${projectId}/finance`)}
+            startIcon={<MonetizationOnIcon />}
+          >
+            Finance
+          </Button>
           {isOwner && (
             <>
               <IconButton color="inherit" onClick={() => setInviteOpen(true)}>
@@ -108,7 +117,10 @@ export function ProjectDetailPage() {
             {project.members.map(
               (m: { id: number; user: { name: string; email: string } }) => (
                 <ListItem key={m.id}>
-                  <ListItemText primary={m.user.name} secondary={m.user.email} />
+                  <ListItemText
+                    primary={m.user.name}
+                    secondary={m.user.email}
+                  />
                 </ListItem>
               ),
             )}

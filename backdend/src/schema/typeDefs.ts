@@ -31,6 +31,28 @@ export const typeDefs = `#graphql
     sender: User!
   }
 
+  type Expense {
+    id: Int!
+    name: String!
+    amount: Float!
+    userId: Int!
+    projectId: Int!
+    createdAt: String!
+    updatedAt: String!
+    user: User!
+  }
+
+  type Income {
+    id: Int!
+    name: String!
+    amount: Float!
+    userId: Int!
+    projectId: Int!
+    createdAt: String!
+    updatedAt: String!
+    user: User!
+  }
+
   type Project {
     id: Int!
     name: String!
@@ -48,6 +70,8 @@ export const typeDefs = `#graphql
     project(id: Int!): Project
     invitations(projectId: Int!): [Invitation!]!
     receivedInvitations: [Invitation!]!
+    expenses(projectId: Int!): [Expense!]!
+    incomes(projectId: Int!): [Income!]!
   }
 
   type Mutation {
@@ -58,5 +82,11 @@ export const typeDefs = `#graphql
     deleteProject(id: Int!): Boolean!
     inviteUserToProject(projectId: Int!, email: String!): Invitation!
     respondToInvitation(id: Int!, accept: Boolean!): Invitation!
+    createExpense(projectId: Int!, name: String!, amount: Float!): Expense!
+    updateExpense(id: Int!, name: String, amount: Float): Expense!
+    deleteExpense(id: Int!): Boolean!
+    createIncome(projectId: Int!, name: String!, amount: Float!): Income!
+    updateIncome(id: Int!, name: String, amount: Float): Income!
+    deleteIncome(id: Int!): Boolean!
   }
 `;
