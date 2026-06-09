@@ -19,6 +19,18 @@ export const typeDefs = `#graphql
     user: User!
   }
 
+  type Invitation {
+    id: Int!
+    projectId: Int!
+    invitedEmail: String!
+    invitedUserId: Int
+    senderId: Int!
+    status: String!
+    createdAt: String!
+    project: Project!
+    sender: User!
+  }
+
   type Project {
     id: Int!
     name: String!
@@ -34,6 +46,8 @@ export const typeDefs = `#graphql
     me: User
     projects: [Project!]!
     project(id: Int!): Project
+    invitations: [Invitation!]!
+    receivedInvitations: [Invitation!]!
   }
 
   type Mutation {
@@ -42,5 +56,7 @@ export const typeDefs = `#graphql
     createProject(name: String!, location: String!): Project!
     updateProject(id: Int!, name: String, location: String): Project!
     deleteProject(id: Int!): Boolean!
+    inviteUserToProject(projectId: Int!, email: String!): Invitation!
+    respondToInvitation(id: Int!, accept: Boolean!): Invitation!
   }
 `;
