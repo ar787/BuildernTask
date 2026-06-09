@@ -30,6 +30,16 @@ export const GET_PROJECT_QUERY = gql`
         name
         email
       }
+      members {
+        id
+        userId
+        joinedAt
+        user {
+          id
+          name
+          email
+        }
+      }
       createdAt
       updatedAt
     }
