@@ -1,5 +1,5 @@
-import type { Request } from "express";
-import jwt from "jsonwebtoken";
+import type { Request } from 'express';
+import jwt from 'jsonwebtoken';
 
 export interface AppContext {
   userId: number | null;
@@ -10,13 +10,9 @@ interface JwtPayload {
   email: string;
 }
 
-export async function buildContext({
-  req,
-}: {
-  req: Request;
-}): Promise<AppContext> {
-  const auth = req.headers.authorization ?? "";
-  if (!auth.startsWith("Bearer ")) return { userId: null };
+export async function buildContext({ req }: { req: Request }): Promise<AppContext> {
+  const auth = req.headers.authorization ?? '';
+  if (!auth.startsWith('Bearer ')) return { userId: null };
 
   const token = auth.slice(7);
   try {

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -13,17 +13,17 @@ import {
   List,
   ListItem,
   ListItemText,
-} from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
-import { useAuth } from "../hooks/useAuth";
-import { EditProjectDialog } from "../components/EditProjectDialog";
-import { DeleteProjectDialog } from "../components/DeleteProjectDialog";
-import { InviteUserDialog } from "../components/InviteUserDialog";
-import { SentInvitationsList } from "../components/SentInvitationsList";
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import { useAuth } from '../hooks/useAuth';
+import { EditProjectDialog } from '../components/EditProjectDialog';
+import { DeleteProjectDialog } from '../components/DeleteProjectDialog';
+import { InviteUserDialog } from '../components/InviteUserDialog';
+import { SentInvitationsList } from '../components/SentInvitationsList';
 
 type Member = {
   id: number;
@@ -85,18 +85,14 @@ export function ProjectDetailPage({
 
   const handleDelete = async () => {
     await onDelete();
-    navigate("/projects");
+    navigate('/projects');
   };
 
   return (
     <>
       <AppBar position="static" color="default" elevation={1}>
         <Toolbar>
-          <IconButton
-            color="inherit"
-            edge="start"
-            onClick={() => navigate("/projects")}
-          >
+          <IconButton color="inherit" edge="start" onClick={() => navigate('/projects')}>
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h6" sx={{ flexGrow: 1, ml: 1 }}>
@@ -139,10 +135,7 @@ export function ProjectDetailPage({
             <Typography variant="h6" sx={{ mt: 4, mb: 1 }}>
               Sent Invitations
             </Typography>
-            <SentInvitationsList
-              invitations={invitations}
-              loading={invitationsLoading}
-            />
+            <SentInvitationsList invitations={invitations} loading={invitationsLoading} />
           </>
         )}
 

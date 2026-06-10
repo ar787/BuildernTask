@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import {
   Alert,
   Box,
@@ -11,11 +11,11 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-} from "@mui/material";
+} from '@mui/material';
 
 const schema = yup.object({
-  name: yup.string().min(1).required("Name is required"),
-  location: yup.string().min(1).required("Location is required"),
+  name: yup.string().min(1).required('Name is required'),
+  location: yup.string().min(1).required('Location is required'),
 });
 
 type FormValues = yup.InferType<typeof schema>;
@@ -52,7 +52,7 @@ export function EditProjectDialog({
       await onSubmit(values);
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong");
+      setError(e instanceof Error ? e.message : 'Something went wrong');
     } finally {
       setSaving(false);
     }
@@ -72,7 +72,7 @@ export function EditProjectDialog({
             label="Name"
             fullWidth
             margin="dense"
-            {...register("name")}
+            {...register('name')}
             error={!!errors.name}
             helperText={errors.name?.message}
           />
@@ -80,7 +80,7 @@ export function EditProjectDialog({
             label="Location"
             fullWidth
             margin="dense"
-            {...register("location")}
+            {...register('location')}
             error={!!errors.location}
             helperText={errors.location?.message}
           />
@@ -88,7 +88,7 @@ export function EditProjectDialog({
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="contained" disabled={saving}>
-            {saving ? "Saving…" : "Save"}
+            {saving ? 'Saving…' : 'Save'}
           </Button>
         </DialogActions>
       </Box>

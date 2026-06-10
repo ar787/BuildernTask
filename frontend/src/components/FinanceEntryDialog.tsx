@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import {
   Alert,
   Box,
@@ -11,14 +11,11 @@ import {
   DialogTitle,
   DialogContent,
   TextField,
-} from "@mui/material";
+} from '@mui/material';
 
 const schema = yup.object({
-  name: yup.string().min(1).required("Name is required"),
-  amount: yup
-    .number()
-    .positive("Must be positive")
-    .required("Amount is required"),
+  name: yup.string().min(1).required('Name is required'),
+  amount: yup.number().positive('Must be positive').required('Amount is required'),
 });
 
 type FormValues = yup.InferType<typeof schema>;
@@ -27,7 +24,7 @@ type FinanceEntryDialogProps = {
   open: boolean;
   onClose: () => void;
   onSubmit: (values: { name: string; amount: number }) => Promise<void>;
-  type: "expense" | "income";
+  type: 'expense' | 'income';
   loading?: boolean;
   error?: string;
   initial?: { name: string; amount: number };
@@ -43,7 +40,7 @@ export function FinanceEntryDialog({
   initial,
 }: Readonly<FinanceEntryDialogProps>) {
   const isEdit = !!initial;
-  const label = type === "expense" ? "Expense" : "Income";
+  const label = type === 'expense' ? 'Expense' : 'Income';
 
   const {
     register,
@@ -53,7 +50,7 @@ export function FinanceEntryDialog({
   } = useForm<FormValues>({ resolver: yupResolver(schema) });
 
   useEffect(() => {
-    if (open) reset(initial ?? { name: "", amount: 0 });
+    if (open) reset(initial ?? { name: '', amount: 0 });
   }, [open, initial, reset]);
 
   const handleClose = () => {
@@ -75,7 +72,7 @@ export function FinanceEntryDialog({
             label="Name"
             fullWidth
             margin="dense"
-            {...register("name")}
+            {...register('name')}
             error={!!errors.name}
             helperText={errors.name?.message}
           />
@@ -84,8 +81,8 @@ export function FinanceEntryDialog({
             type="number"
             fullWidth
             margin="dense"
-            slotProps={{ htmlInput: { step: "0.01", min: "0" } }}
-            {...register("amount")}
+            slotProps={{ htmlInput: { step: '0.01', min: '0' } }}
+            {...register('amount')}
             error={!!errors.amount}
             helperText={errors.amount?.message}
           />
@@ -93,7 +90,7 @@ export function FinanceEntryDialog({
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
           <Button type="submit" variant="contained" disabled={loading}>
-            {loading ? "Saving…" : "Save"}
+            {loading ? 'Saving…' : 'Save'}
           </Button>
         </DialogActions>
       </Box>

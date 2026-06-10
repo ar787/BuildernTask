@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -12,9 +12,9 @@ import {
   Toolbar,
   CircularProgress,
   Alert,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import { CreateProjectDialog } from "../components/CreateProjectDialog";
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { CreateProjectDialog } from '../components/CreateProjectDialog';
 
 type Project = {
   id: number;
@@ -32,12 +32,7 @@ type ProjectsPageProps = {
   onCreate: (values: { name: string; location: string }) => Promise<void>;
 };
 
-export function ProjectsPage({
-  projects,
-  loading,
-  error,
-  onCreate,
-}: Readonly<ProjectsPageProps>) {
+export function ProjectsPage({ projects, loading, error, onCreate }: Readonly<ProjectsPageProps>) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -52,12 +47,8 @@ export function ProjectsPage({
       </AppBar>
 
       <Container maxWidth="md" sx={{ mt: 4 }}>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 3 }}>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => setOpen(true)}
-          >
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpen(true)}>
             New Project
           </Button>
         </Box>
@@ -67,16 +58,14 @@ export function ProjectsPage({
 
         <Box
           sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
             gap: 2,
           }}
         >
           {projects.map((project) => (
             <Card key={project.id}>
-              <CardActionArea
-                onClick={() => navigate(`/projects/${project.id}`)}
-              >
+              <CardActionArea onClick={() => navigate(`/projects/${project.id}`)}>
                 <CardContent>
                   <Typography variant="h6">{project.name}</Typography>
                   <Typography variant="body2" color="text.secondary">
@@ -92,20 +81,13 @@ export function ProjectsPage({
         </Box>
 
         {projects.length === 0 && !loading && (
-          <Typography
-            color="text.secondary"
-            sx={{ textAlign: "center", mt: 6 }}
-          >
+          <Typography color="text.secondary" sx={{ textAlign: 'center', mt: 6 }}>
             No projects yet. Create your first one!
           </Typography>
         )}
       </Container>
 
-      <CreateProjectDialog
-        open={open}
-        onClose={() => setOpen(false)}
-        onSubmit={onCreate}
-      />
+      <CreateProjectDialog open={open} onClose={() => setOpen(false)} onSubmit={onCreate} />
     </>
   );
 }

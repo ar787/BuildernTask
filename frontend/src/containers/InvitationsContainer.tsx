@@ -1,7 +1,7 @@
-import { useQuery, useMutation } from "@apollo/client/react";
-import { GET_RECEIVED_INVITATIONS_QUERY } from "../graphql/queries";
-import { RESPOND_INVITATION_MUTATION } from "../graphql/mutations";
-import { InvitationsPage } from "../pages/InvitationsPage";
+import { useQuery, useMutation } from '@apollo/client/react';
+import { GET_RECEIVED_INVITATIONS_QUERY } from '../graphql/queries';
+import { RESPOND_INVITATION_MUTATION } from '../graphql/mutations';
+import { InvitationsPage } from '../pages/InvitationsPage';
 
 export function InvitationsContainer() {
   const { data, loading, error } = useQuery(GET_RECEIVED_INVITATIONS_QUERY);
@@ -13,9 +13,7 @@ export function InvitationsContainer() {
       cache.writeQuery({
         query: GET_RECEIVED_INVITATIONS_QUERY,
         data: {
-          receivedInvitations: existing.receivedInvitations.filter(
-            (i) => i.id !== variables?.id,
-          ),
+          receivedInvitations: existing.receivedInvitations.filter((i) => i.id !== variables?.id),
         },
       });
     },

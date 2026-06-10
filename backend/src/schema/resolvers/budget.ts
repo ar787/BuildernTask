@@ -1,17 +1,13 @@
-import prisma from "../../db.js";
-import {
-  requireAuth,
-  requirePermission,
-  PERMISSIONS,
-} from "../../middleware/auth.js";
-import type { AppContext } from "../../context.js";
+import prisma from '../../db.js';
+import { requireAuth, requirePermission, PERMISSIONS } from '../../middleware/auth.js';
+import type { AppContext } from '../../context.js';
 
 type Totals = Record<string, { totalExpense: number; totalIncome: number }>;
 const normalize = (s: string) => s.trim().toLowerCase();
 const upsertTotal = (
   totals: Totals,
   name: string,
-  field: "totalExpense" | "totalIncome",
+  field: 'totalExpense' | 'totalIncome',
   amount: number,
 ) => {
   const key = normalize(name);
@@ -23,11 +19,7 @@ const upsertTotal = (
 
 export const budgetResolvers = {
   Query: {
-    budgetReport: async (
-      _: unknown,
-      { projectId }: { projectId: number },
-      context: AppContext,
-    ) => {
+    budgetReport: async (_: unknown, { projectId }: { projectId: number }, context: AppContext) => {
       const userId = requireAuth(context);
       await requirePermission(projectId, userId, PERMISSIONS.EXPENSE.READ);
 
@@ -38,13 +30,9 @@ export const budgetResolvers = {
 
       const totals: Totals = {};
 
-      expenses.forEach((ex) =>
-        upsertTotal(totals, ex.name, "totalExpense", ex.amount),
-      );
+      expenses.forEach((ex) => upsertTotal(totals, ex.name, 'totalExpense', ex.amount));
 
-      incomes.forEach((inc) =>
-        upsertTotal(totals, inc.name, "totalIncome", inc.amount),
-      );
+      incomes.forEach((inc) => upsertTotal(totals, inc.name, 'totalIncome', inc.amount));
 
       const totalReport = [];
       for (const key in totals) {

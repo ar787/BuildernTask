@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -13,8 +13,8 @@ import {
   Box,
   CircularProgress,
   Alert,
-} from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 type Invitation = {
   id: number;
@@ -55,11 +55,7 @@ export function InvitationsPage({
     <>
       <AppBar position="static" color="default" elevation={1}>
         <Toolbar>
-          <IconButton
-            color="inherit"
-            edge="start"
-            onClick={() => navigate("/projects")}
-          >
+          <IconButton color="inherit" edge="start" onClick={() => navigate('/projects')}>
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h6" sx={{ ml: 1 }}>
@@ -73,10 +69,7 @@ export function InvitationsPage({
         {error && <Alert severity="error">{error}</Alert>}
 
         {!loading && invitations.length === 0 && (
-          <Typography
-            color="text.secondary"
-            sx={{ textAlign: "center", mt: 6 }}
-          >
+          <Typography color="text.secondary" sx={{ textAlign: 'center', mt: 6 }}>
             No pending invitations.
           </Typography>
         )}
@@ -86,7 +79,7 @@ export function InvitationsPage({
             <ListItem
               key={inv.id}
               secondaryAction={
-                <Box sx={{ display: "flex", gap: 1 }}>
+                <Box sx={{ display: 'flex', gap: 1 }}>
                   <Button
                     size="small"
                     variant="contained"

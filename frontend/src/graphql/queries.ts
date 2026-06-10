@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client";
-import type { TypedDocumentNode } from "@apollo/client";
-import type { Project, Invitation, Entry, BudgetLine } from "../types";
+import { gql } from '@apollo/client';
+import type { TypedDocumentNode } from '@apollo/client';
+import type { Project, Invitation, Entry, BudgetLine } from '../types';
 
 export const GET_PROJECTS_QUERY: TypedDocumentNode<
   { projects: Project[] },
@@ -23,10 +23,7 @@ export const GET_PROJECTS_QUERY: TypedDocumentNode<
   }
 `;
 
-export const GET_PROJECT_QUERY: TypedDocumentNode<
-  { project: Project },
-  { id: number }
-> = gql`
+export const GET_PROJECT_QUERY: TypedDocumentNode<{ project: Project }, { id: number }> = gql`
   query GetProject($id: Int!) {
     project(id: $id) {
       id
@@ -80,43 +77,39 @@ export const GET_INVITATIONS_QUERY: TypedDocumentNode<
   }
 `;
 
-export const GET_EXPENSES_QUERY: TypedDocumentNode<
-  { expenses: Entry[] },
-  { projectId: number }
-> = gql`
-  query GetExpenses($projectId: Int!) {
-    expenses(projectId: $projectId) {
-      id
-      name
-      amount
-      userId
-      createdAt
-      user {
+export const GET_EXPENSES_QUERY: TypedDocumentNode<{ expenses: Entry[] }, { projectId: number }> =
+  gql`
+    query GetExpenses($projectId: Int!) {
+      expenses(projectId: $projectId) {
         id
         name
+        amount
+        userId
+        createdAt
+        user {
+          id
+          name
+        }
       }
     }
-  }
-`;
+  `;
 
-export const GET_INCOMES_QUERY: TypedDocumentNode<
-  { incomes: Entry[] },
-  { projectId: number }
-> = gql`
-  query GetIncomes($projectId: Int!) {
-    incomes(projectId: $projectId) {
-      id
-      name
-      amount
-      userId
-      createdAt
-      user {
+export const GET_INCOMES_QUERY: TypedDocumentNode<{ incomes: Entry[] }, { projectId: number }> =
+  gql`
+    query GetIncomes($projectId: Int!) {
+      incomes(projectId: $projectId) {
         id
         name
+        amount
+        userId
+        createdAt
+        user {
+          id
+          name
+        }
       }
     }
-  }
-`;
+  `;
 
 export const GET_BUDGET_REPORT_QUERY: TypedDocumentNode<
   { budgetReport: BudgetLine[] },

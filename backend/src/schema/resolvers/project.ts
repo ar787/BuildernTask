@@ -1,11 +1,7 @@
-import { GraphQLError } from "graphql";
-import prisma from "../../db.js";
-import {
-  requireAuth,
-  requirePermission,
-  PERMISSIONS,
-} from "../../middleware/auth.js";
-import type { AppContext } from "../../context.js";
+import { GraphQLError } from 'graphql';
+import prisma from '../../db.js';
+import { requireAuth, requirePermission, PERMISSIONS } from '../../middleware/auth.js';
+import type { AppContext } from '../../context.js';
 
 const projectInclude = {
   owner: true,
@@ -24,11 +20,7 @@ export const projectResolvers = {
       });
     },
 
-    project: async (
-      _: unknown,
-      { id }: { id: number },
-      context: AppContext,
-    ) => {
+    project: async (_: unknown, { id }: { id: number }, context: AppContext) => {
       const userId = requireAuth(context);
       const project = await prisma.project.findFirst({
         where: {
@@ -38,8 +30,8 @@ export const projectResolvers = {
         include: projectInclude,
       });
       if (!project) {
-        throw new GraphQLError("Project not found or access denied", {
-          extensions: { code: "NOT_FOUND" },
+        throw new GraphQLError('Project not found or access denied', {
+          extensions: { code: 'NOT_FOUND' },
         });
       }
       return project;
@@ -67,8 +59,8 @@ export const projectResolvers = {
       const userId = requireAuth(context);
       const project = await prisma.project.findUnique({ where: { id } });
       if (!project) {
-        throw new GraphQLError("Project not found", {
-          extensions: { code: "NOT_FOUND" },
+        throw new GraphQLError('Project not found', {
+          extensions: { code: 'NOT_FOUND' },
         });
       }
       await requirePermission(id, userId, PERMISSIONS.PROJECT.UPDATE);
@@ -82,16 +74,12 @@ export const projectResolvers = {
       });
     },
 
-    deleteProject: async (
-      _: unknown,
-      { id }: { id: number },
-      context: AppContext,
-    ) => {
+    deleteProject: async (_: unknown, { id }: { id: number }, context: AppContext) => {
       const userId = requireAuth(context);
       const project = await prisma.project.findUnique({ where: { id } });
       if (!project) {
-        throw new GraphQLError("Project not found", {
-          extensions: { code: "NOT_FOUND" },
+        throw new GraphQLError('Project not found', {
+          extensions: { code: 'NOT_FOUND' },
         });
       }
       await requirePermission(id, userId, PERMISSIONS.PROJECT.DELETE);

@@ -1,10 +1,4 @@
-import {
-  CircularProgress,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-} from "@mui/material";
+import { CircularProgress, List, ListItem, ListItemText, Typography } from '@mui/material';
 
 type Invitation = {
   id: number;
@@ -17,16 +11,11 @@ type SentInvitationsListProps = {
   loading: boolean;
 };
 
-export function SentInvitationsList({
-  invitations,
-  loading,
-}: Readonly<SentInvitationsListProps>) {
+export function SentInvitationsList({ invitations, loading }: Readonly<SentInvitationsListProps>) {
   if (loading) return <CircularProgress />;
 
   if (invitations.length === 0)
-    return (
-      <Typography color="text.secondary">No pending invitations.</Typography>
-    );
+    return <Typography color="text.secondary">No pending invitations.</Typography>;
 
   return (
     <List dense>

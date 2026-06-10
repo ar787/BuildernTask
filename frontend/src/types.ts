@@ -24,7 +24,7 @@ export type Invitation = {
   invitedEmail: string;
   status: string;
   createdAt: string;
-  project: Pick<Project, "id" | "name" | "location" | "createdAt">;
+  project: Pick<Project, 'id' | 'name' | 'location' | 'createdAt'>;
   sender: ProjectOwner;
 };
 
@@ -34,7 +34,7 @@ export type Entry = {
   amount: number;
   userId: number;
   createdAt: string;
-  user: Pick<ProjectOwner, "id" | "name">;
+  user: Pick<ProjectOwner, 'id' | 'name'>;
 };
 
 export type BudgetLine = {

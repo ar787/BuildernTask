@@ -1,23 +1,24 @@
-import { GraphQLError } from "graphql";
-import prisma from "../../db.js";
-import { requireAuth, requirePermission, requireCreatorOrPermission, PERMISSIONS } from "../../middleware/auth.js";
-import type { AppContext } from "../../context.js";
+import { GraphQLError } from 'graphql';
+import prisma from '../../db.js';
+import {
+  requireAuth,
+  requirePermission,
+  requireCreatorOrPermission,
+  PERMISSIONS,
+} from '../../middleware/auth.js';
+import type { AppContext } from '../../context.js';
 
 const include = { user: true } as const;
 
 export const incomeResolvers = {
   Query: {
-    incomes: async (
-      _: unknown,
-      { projectId }: { projectId: number },
-      context: AppContext,
-    ) => {
+    incomes: async (_: unknown, { projectId }: { projectId: number }, context: AppContext) => {
       const userId = requireAuth(context);
       await requirePermission(projectId, userId, PERMISSIONS.INCOME.READ);
       return prisma.income.findMany({
         where: { projectId },
         include,
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
       });
     },
   },
@@ -25,11 +26,7 @@ export const incomeResolvers = {
   Mutation: {
     createIncome: async (
       _: unknown,
-      {
-        projectId,
-        name,
-        amount,
-      }: { projectId: number; name: string; amount: number },
+      { projectId, name, amount }: { projectId: number; name: string; amount: number },
       context: AppContext,
     ) => {
       const userId = requireAuth(context);
@@ -48,11 +45,16 @@ export const incomeResolvers = {
       const userId = requireAuth(context);
       const income = await prisma.income.findUnique({ where: { id } });
       if (!income) {
-        throw new GraphQLError("Income not found", {
-          extensions: { code: "NOT_FOUND" },
+        throw new GraphQLError('Income not found', {
+          extensions: { code: 'NOT_FOUND' },
         });
       }
-      await requireCreatorOrPermission(income.userId, income.projectId, userId, PERMISSIONS.INCOME.UPDATE);
+      await requireCreatorOrPermission(
+        income.userId,
+        income.projectId,
+        userId,
+        PERMISSIONS.INCOME.UPDATE,
+      );
       return prisma.income.update({
         where: { id },
         data: {
@@ -63,19 +65,20 @@ export const incomeResolvers = {
       });
     },
 
-    deleteIncome: async (
-      _: unknown,
-      { id }: { id: number },
-      context: AppContext,
-    ) => {
+    deleteIncome: async (_: unknown, { id }: { id: number }, context: AppContext) => {
       const userId = requireAuth(context);
       const income = await prisma.income.findUnique({ where: { id } });
       if (!income) {
-        throw new GraphQLError("Income not found", {
-          extensions: { code: "NOT_FOUND" },
+        throw new GraphQLError('Income not found', {
+          extensions: { code: 'NOT_FOUND' },
         });
       }
-      await requireCreatorOrPermission(income.userId, income.projectId, userId, PERMISSIONS.INCOME.DELETE);
+      await requireCreatorOrPermission(
+        income.userId,
+        income.projectId,
+        userId,
+        PERMISSIONS.INCOME.DELETE,
+      );
       await prisma.income.delete({ where: { id } });
       return true;
     },

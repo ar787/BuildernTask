@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import {
   Alert,
   Box,
@@ -11,11 +11,11 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-} from "@mui/material";
+} from '@mui/material';
 
 const schema = yup.object({
-  name: yup.string().min(1).required("Name is required"),
-  location: yup.string().min(1).required("Location is required"),
+  name: yup.string().min(1).required('Name is required'),
+  location: yup.string().min(1).required('Location is required'),
 });
 
 type FormValues = yup.InferType<typeof schema>;
@@ -49,7 +49,7 @@ export function CreateProjectDialog({
       reset();
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong");
+      setError(e instanceof Error ? e.message : 'Something went wrong');
     } finally {
       setCreating(false);
     }
@@ -74,7 +74,7 @@ export function CreateProjectDialog({
             label="Name"
             fullWidth
             margin="dense"
-            {...register("name")}
+            {...register('name')}
             error={!!errors.name}
             helperText={errors.name?.message}
           />
@@ -82,7 +82,7 @@ export function CreateProjectDialog({
             label="Location"
             fullWidth
             margin="dense"
-            {...register("location")}
+            {...register('location')}
             error={!!errors.location}
             helperText={errors.location?.message}
           />
@@ -90,7 +90,7 @@ export function CreateProjectDialog({
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
           <Button type="submit" variant="contained" disabled={creating}>
-            {creating ? "Creating…" : "Create"}
+            {creating ? 'Creating…' : 'Create'}
           </Button>
         </DialogActions>
       </Box>

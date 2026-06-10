@@ -11,7 +11,7 @@ Full-stack project management app with expense and income tracking.
 
 ```
 BuildernTask/
-  backdend/   ← GraphQL API
+  backend/   ← GraphQL API
   frontend/   ← React SPA
 ```
 
@@ -24,7 +24,7 @@ BuildernTask/
 **Prerequisites:** Node.js 18+, a running MySQL instance.
 
 ```bash
-cd backdend
+cd backend
 npm install
 ```
 
@@ -76,7 +76,7 @@ EXIT;
 **2. Run migrations to create all tables:**
 
 ```bash
-cd backdend
+cd backend
 npx prisma migrate deploy
 ```
 
@@ -92,12 +92,14 @@ npx prisma generate
 
 ### Environment Variables
 
-Create a `.env` file in the `backdend/` directory:
+Create a `.env` file in the `backend/` directory:
 
 > **Generating a JWT secret:**
+>
 > ```bash
 > node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 > ```
+>
 > Copy the output and use it as your `JWT_SECRET`.
 
 ```env
@@ -201,7 +203,7 @@ Open two terminals:
 
 ```bash
 # Terminal 1 — backend
-cd backdend && npm run dev
+cd backend && npm run dev
 
 # Terminal 2 — frontend
 cd frontend && npm run dev

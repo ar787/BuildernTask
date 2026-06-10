@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { Navigate, Outlet } from "react-router-dom";
-import { useAuth, TOKEN_KEY, isTokenExpired } from "../hooks/useAuth";
+import { useEffect } from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth, TOKEN_KEY, isTokenExpired } from '../hooks/useAuth';
 
 export function AuthGuard() {
   const { isAuthenticated, logout } = useAuth();

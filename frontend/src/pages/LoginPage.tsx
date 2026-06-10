@@ -1,26 +1,15 @@
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useMutation } from "@apollo/client/react";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  Box,
-  Button,
-  Container,
-  TextField,
-  Typography,
-  Alert,
-  Paper,
-} from "@mui/material";
-import { LOGIN_MUTATION } from "../graphql/mutations";
-import { useAuth } from "../hooks/useAuth";
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { useMutation } from '@apollo/client/react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Box, Button, Container, TextField, Typography, Alert, Paper } from '@mui/material';
+import { LOGIN_MUTATION } from '../graphql/mutations';
+import { useAuth } from '../hooks/useAuth';
 
 const schema = yup.object({
-  email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup
-    .string()
-    .min(6, "Min 6 characters")
-    .required("Password is required"),
+  email: yup.string().email('Invalid email').required('Email is required'),
+  password: yup.string().min(6, 'Min 6 characters').required('Password is required'),
 });
 
 type FormValues = yup.InferType<typeof schema>;
@@ -39,9 +28,11 @@ export function LoginPage() {
 
   const onSubmit = async (values: FormValues) => {
     const result = await loginMutation({ variables: values });
-    const data = result.data as { login: { token: string; user: { id: number; name: string; email: string } } };
+    const data = result.data as {
+      login: { token: string; user: { id: number; name: string; email: string } };
+    };
     login(data.login.token, data.login.user);
-    navigate("/projects");
+    navigate('/projects');
   };
 
   return (
@@ -62,7 +53,7 @@ export function LoginPage() {
               type="email"
               fullWidth
               margin="normal"
-              {...register("email")}
+              {...register('email')}
               error={!!errors.email}
               helperText={errors.email?.message}
             />
@@ -71,7 +62,7 @@ export function LoginPage() {
               type="password"
               fullWidth
               margin="normal"
-              {...register("password")}
+              {...register('password')}
               error={!!errors.password}
               helperText={errors.password?.message}
             />
@@ -83,11 +74,11 @@ export function LoginPage() {
               sx={{ mt: 2 }}
               disabled={loading}
             >
-              {loading ? "Signing in…" : "Sign in"}
+              {loading ? 'Signing in…' : 'Sign in'}
             </Button>
-            <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
-              No account?{" "}
-              <Link to="/register" style={{ color: "inherit" }}>
+            <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
+              No account?{' '}
+              <Link to="/register" style={{ color: 'inherit' }}>
                 Register
               </Link>
             </Typography>

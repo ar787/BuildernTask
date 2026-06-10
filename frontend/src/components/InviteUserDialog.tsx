@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import {
   Alert,
   Button,
@@ -11,10 +11,10 @@ import {
   DialogContentText,
   DialogTitle,
   TextField,
-} from "@mui/material";
+} from '@mui/material';
 
 const schema = yup.object({
-  email: yup.string().email("Invalid email").required("Email is required"),
+  email: yup.string().email('Invalid email').required('Email is required'),
 });
 
 type FormValues = yup.InferType<typeof schema>;
@@ -25,11 +25,7 @@ type InviteUserDialogProps = {
   onInvite: (email: string) => Promise<void>;
 };
 
-export function InviteUserDialog({
-  open,
-  onClose,
-  onInvite,
-}: Readonly<InviteUserDialogProps>) {
+export function InviteUserDialog({ open, onClose, onInvite }: Readonly<InviteUserDialogProps>) {
   const [inviting, setInviting] = useState(false);
   const [error, setError] = useState<string>();
 
@@ -48,7 +44,7 @@ export function InviteUserDialog({
       reset();
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong");
+      setError(e instanceof Error ? e.message : 'Something went wrong');
     } finally {
       setInviting(false);
     }
@@ -71,19 +67,15 @@ export function InviteUserDialog({
           type="email"
           fullWidth
           margin="dense"
-          {...register("email")}
+          {...register('email')}
           error={!!errors.email}
           helperText={errors.email?.message}
         />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button
-          color="primary"
-          onClick={handleSubmit(handleInvite)}
-          disabled={inviting}
-        >
-          {inviting ? "Inviting…" : "Invite"}
+        <Button color="primary" onClick={handleSubmit(handleInvite)} disabled={inviting}>
+          {inviting ? 'Inviting…' : 'Invite'}
         </Button>
       </DialogActions>
     </Dialog>

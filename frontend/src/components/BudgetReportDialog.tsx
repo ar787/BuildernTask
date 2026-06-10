@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Alert,
   CircularProgress,
@@ -11,7 +11,7 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from "@mui/material";
+} from '@mui/material';
 
 type BudgetLine = {
   name: string;
@@ -57,17 +57,15 @@ export function BudgetReportDialog({
           {budgetReport.map((row) => (
             <TableRow key={row.name}>
               <TableCell>{row.name}</TableCell>
-              <TableCell align="right">
-                ${row.totalExpense.toFixed(2)}
-              </TableCell>
+              <TableCell align="right">${row.totalExpense.toFixed(2)}</TableCell>
               <TableCell align="right">${row.totalIncome.toFixed(2)}</TableCell>
               <TableCell
                 align="right"
                 sx={{
-                  color: row.difference >= 0 ? "success.main" : "error.main",
+                  color: row.difference >= 0 ? 'success.main' : 'error.main',
                 }}
               >
-                {row.difference >= 0 ? "+" : ""}${row.difference.toFixed(2)}
+                {row.difference >= 0 ? '+' : ''}${row.difference.toFixed(2)}
               </TableCell>
             </TableRow>
           ))}

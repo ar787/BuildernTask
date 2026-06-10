@@ -1,25 +1,28 @@
-import { useQuery, useMutation } from "@apollo/client/react";
-import { useParams } from "react-router-dom";
-import { GET_PROJECT_QUERY, GET_INVITATIONS_QUERY, GET_PROJECTS_QUERY } from "../graphql/queries";
+import { useQuery, useMutation } from '@apollo/client/react';
+import { useParams } from 'react-router-dom';
+import { GET_PROJECT_QUERY, GET_INVITATIONS_QUERY, GET_PROJECTS_QUERY } from '../graphql/queries';
 import {
   UPDATE_PROJECT_MUTATION,
   DELETE_PROJECT_MUTATION,
   INVITE_USER_MUTATION,
-} from "../graphql/mutations";
-import { ProjectDetailPage } from "../pages/ProjectDetailPage";
+} from '../graphql/mutations';
+import { ProjectDetailPage } from '../pages/ProjectDetailPage';
 
 export function ProjectDetailContainer() {
   const { id } = useParams<{ id: string }>();
   const projectId = Number(id);
 
-  const { data: projectData, loading, error } = useQuery(GET_PROJECT_QUERY, {
+  const {
+    data: projectData,
+    loading,
+    error,
+  } = useQuery(GET_PROJECT_QUERY, {
     variables: { id: projectId },
   });
 
-  const { data: invitationsData, loading: invitationsLoading } = useQuery(
-    GET_INVITATIONS_QUERY,
-    { variables: { projectId } },
-  );
+  const { data: invitationsData, loading: invitationsLoading } = useQuery(GET_INVITATIONS_QUERY, {
+    variables: { projectId },
+  });
 
   const [updateProject] = useMutation(UPDATE_PROJECT_MUTATION);
 

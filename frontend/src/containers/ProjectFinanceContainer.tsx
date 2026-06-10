@@ -1,11 +1,11 @@
-import { useQuery, useMutation, useLazyQuery } from "@apollo/client/react";
-import { useParams } from "react-router-dom";
+import { useQuery, useMutation, useLazyQuery } from '@apollo/client/react';
+import { useParams } from 'react-router-dom';
 import {
   GET_PROJECT_QUERY,
   GET_EXPENSES_QUERY,
   GET_INCOMES_QUERY,
   GET_BUDGET_REPORT_QUERY,
-} from "../graphql/queries";
+} from '../graphql/queries';
 import {
   CREATE_EXPENSE_MUTATION,
   UPDATE_EXPENSE_MUTATION,
@@ -13,8 +13,8 @@ import {
   CREATE_INCOME_MUTATION,
   UPDATE_INCOME_MUTATION,
   DELETE_INCOME_MUTATION,
-} from "../graphql/mutations";
-import { ProjectFinancePage } from "../pages/ProjectFinancePage";
+} from '../graphql/mutations';
+import { ProjectFinancePage } from '../pages/ProjectFinancePage';
 
 export function ProjectFinanceContainer() {
   const { id } = useParams<{ id: string }>();
@@ -36,10 +36,8 @@ export function ProjectFinanceContainer() {
     error: incomesError,
   } = useQuery(GET_INCOMES_QUERY, { variables: { projectId } });
 
-  const [
-    fetchBudgetReport,
-    { data: budgetData, loading: budgetLoading, error: budgetError },
-  ] = useLazyQuery(GET_BUDGET_REPORT_QUERY, { fetchPolicy: "network-only" });
+  const [fetchBudgetReport, { data: budgetData, loading: budgetLoading, error: budgetError }] =
+    useLazyQuery(GET_BUDGET_REPORT_QUERY, { fetchPolicy: 'network-only' });
 
   const budgetReport = budgetData?.budgetReport ?? [];
 

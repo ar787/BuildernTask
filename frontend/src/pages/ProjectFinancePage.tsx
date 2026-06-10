@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Box,
@@ -16,15 +16,15 @@ import {
   Typography,
   Alert,
   Button,
-} from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AssessmentIcon from "@mui/icons-material/Assessment";
-import { useAuth } from "../hooks/useAuth";
-import { FinanceEntryDialog } from "../components/FinanceEntryDialog";
-import { BudgetReportDialog } from "../components/BudgetReportDialog";
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import { useAuth } from '../hooks/useAuth';
+import { FinanceEntryDialog } from '../components/FinanceEntryDialog';
+import { BudgetReportDialog } from '../components/BudgetReportDialog';
 
 type Entry = {
   id: number;
@@ -42,9 +42,7 @@ type BudgetLine = {
   difference: number;
 };
 
-type DialogState =
-  | { open: false }
-  | { open: true; type: "expense" | "income"; entry?: Entry };
+type DialogState = { open: false } | { open: true; type: 'expense' | 'income'; entry?: Entry };
 
 type ProjectFinancePageProps = {
   projectId: number;
@@ -58,16 +56,10 @@ type ProjectFinancePageProps = {
   budgetError?: string;
   onOpenBudget: () => void;
   onCreateExpense: (v: { name: string; amount: number }) => Promise<unknown>;
-  onUpdateExpense: (
-    id: number,
-    v: { name?: string; amount?: number },
-  ) => Promise<unknown>;
+  onUpdateExpense: (id: number, v: { name?: string; amount?: number }) => Promise<unknown>;
   onDeleteExpense: (id: number) => Promise<unknown>;
   onCreateIncome: (v: { name: string; amount: number }) => Promise<unknown>;
-  onUpdateIncome: (
-    id: number,
-    v: { name?: string; amount?: number },
-  ) => Promise<unknown>;
+  onUpdateIncome: (id: number, v: { name?: string; amount?: number }) => Promise<unknown>;
   onDeleteIncome: (id: number) => Promise<unknown>;
 };
 
@@ -102,17 +94,16 @@ export function ProjectFinancePage({
   const entries: Entry[] = isExpenseTab ? expenses : incomes;
   const total = entries.reduce((sum, e) => sum + e.amount, 0);
 
-  const canModify = (entry: Entry) =>
-    user?.id === entry.userId || user?.id === ownerId;
+  const canModify = (entry: Entry) => user?.id === entry.userId || user?.id === ownerId;
 
   const openAdd = () => {
     setMutationError(undefined);
-    setDialog({ open: true, type: isExpenseTab ? "expense" : "income" });
+    setDialog({ open: true, type: isExpenseTab ? 'expense' : 'income' });
   };
 
   const openEdit = (entry: Entry) => {
     setMutationError(undefined);
-    setDialog({ open: true, type: isExpenseTab ? "expense" : "income", entry });
+    setDialog({ open: true, type: isExpenseTab ? 'expense' : 'income', entry });
   };
 
   const handleSubmit = async (values: { name: string; amount: number }) => {
@@ -132,7 +123,7 @@ export function ProjectFinancePage({
       }
       setDialog({ open: false });
     } catch (e: unknown) {
-      setMutationError(e instanceof Error ? e.message : "Something went wrong");
+      setMutationError(e instanceof Error ? e.message : 'Something went wrong');
     } finally {
       setMutating(false);
     }
@@ -187,11 +178,8 @@ export function ProjectFinancePage({
         {error && <Alert severity="error">{error}</Alert>}
 
         {!loading && entries.length === 0 ? (
-          <Typography
-            color="text.secondary"
-            sx={{ textAlign: "center", mt: 6 }}
-          >
-            No {isExpenseTab ? "expenses" : "incomes"} yet.
+          <Typography color="text.secondary" sx={{ textAlign: 'center', mt: 6 }}>
+            No {isExpenseTab ? 'expenses' : 'incomes'} yet.
           </Typography>
         ) : (
           <List>
@@ -200,15 +188,11 @@ export function ProjectFinancePage({
                 key={entry.id}
                 secondaryAction={
                   canModify(entry) ? (
-                    <Box sx={{ display: "flex", gap: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
                       <IconButton size="small" onClick={() => openEdit(entry)}>
                         <EditIcon fontSize="small" />
                       </IconButton>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => handleDelete(entry)}
-                      >
+                      <IconButton size="small" color="error" onClick={() => handleDelete(entry)}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                     </Box>
@@ -219,8 +203,8 @@ export function ProjectFinancePage({
                   primary={
                     <Box
                       sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
+                        display: 'flex',
+                        justifyContent: 'space-between',
                         pr: 10,
                       }}
                     >
@@ -238,8 +222,8 @@ export function ProjectFinancePage({
                 primary={
                   <Box
                     sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
+                      display: 'flex',
+                      justifyContent: 'space-between',
                       pr: 10,
                     }}
                   >
@@ -266,9 +250,7 @@ export function ProjectFinancePage({
           open
           type={dialog.type}
           initial={
-            dialog.entry
-              ? { name: dialog.entry.name, amount: dialog.entry.amount }
-              : undefined
+            dialog.entry ? { name: dialog.entry.name, amount: dialog.entry.amount } : undefined
           }
           loading={mutating}
           error={mutationError}

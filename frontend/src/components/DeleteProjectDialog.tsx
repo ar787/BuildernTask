@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Button,
   Dialog,
@@ -6,7 +6,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-} from "@mui/material";
+} from '@mui/material';
 
 type DeleteProjectDialogProps = {
   open: boolean;
@@ -37,14 +37,13 @@ export function DeleteProjectDialog({
       <DialogTitle>Delete Project</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete "{projectName}"? This cannot be
-          undone.
+          Are you sure you want to delete "{projectName}"? This cannot be undone.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button color="error" onClick={handleDelete} disabled={deleting}>
-          {deleting ? "Deleting…" : "Delete"}
+          {deleting ? 'Deleting…' : 'Delete'}
         </Button>
       </DialogActions>
     </Dialog>

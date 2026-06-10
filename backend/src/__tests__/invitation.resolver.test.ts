@@ -1,6 +1,6 @@
-import { invitationResolvers } from "../schema/resolvers/invitation.js";
+import { invitationResolvers } from '../schema/resolvers/invitation.js';
 
-jest.mock("../db.js", () => ({
+jest.mock('../db.js', () => ({
   __esModule: true,
   default: {
     $transaction: jest.fn(),
@@ -17,21 +17,19 @@ jest.mock("../db.js", () => ({
   },
 }));
 
-import prisma from "../db.js";
+import prisma from '../db.js';
 
 const mock = {
   project: prisma.project as jest.Mocked<typeof prisma.project>,
   user: prisma.user as jest.Mocked<typeof prisma.user>,
   invitation: prisma.invitation as jest.Mocked<typeof prisma.invitation>,
-  projectMember: prisma.projectMember as jest.Mocked<
-    typeof prisma.projectMember
-  >,
+  projectMember: prisma.projectMember as jest.Mocked<typeof prisma.projectMember>,
 };
 
 const ctx = (userId: number) => ({ userId });
 
-const fakeOwner = { id: 1, name: "Alice", email: "alice@example.com" };
-const fakeInvitee = { id: 2, name: "Bob", email: "bob@example.com" };
+const fakeOwner = { id: 1, name: 'Alice', email: 'alice@example.com' };
+const fakeInvitee = { id: 2, name: 'Bob', email: 'bob@example.com' };
 const fakeProject = { id: 10, ownerId: 1, owner: fakeOwner };
 
 const pendingInvitation = {
@@ -39,8 +37,8 @@ const pendingInvitation = {
   projectId: 10,
   invitedUserId: 2,
   senderId: 1,
-  invitedEmail: "bob@example.com",
-  status: "PENDING",
+  invitedEmail: 'bob@example.com',
+  status: 'PENDING',
   createdAt: new Date(),
   sender: fakeOwner,
   project: fakeProject,
@@ -49,20 +47,18 @@ const pendingInvitation = {
 beforeEach(() => {
   jest.clearAllMocks();
   // Make $transaction execute the callback immediately with the same mock client
-  (prisma.$transaction as jest.Mock).mockImplementation(
-    (fn: (tx: typeof prisma) => unknown) => fn(prisma),
+  (prisma.$transaction as jest.Mock).mockImplementation((fn: (tx: typeof prisma) => unknown) =>
+    fn(prisma),
   );
 });
 
 // ─── respondToInvitation ─────────────────────────────────────────────────────
 
-describe("respondToInvitation mutation", () => {
-  it("accepts invitation: sets status ACCEPTED and adds user as project member", async () => {
-    const accepted = { ...pendingInvitation, status: "ACCEPTED" };
+describe('respondToInvitation mutation', () => {
+  it('accepts invitation: sets status ACCEPTED and adds user as project member', async () => {
+    const accepted = { ...pendingInvitation, status: 'ACCEPTED' };
 
-    (mock.invitation.findUnique as jest.Mock).mockResolvedValue(
-      pendingInvitation,
-    );
+    (mock.invitation.findUnique as jest.Mock).mockResolvedValue(pendingInvitation);
     (mock.invitation.update as jest.Mock).mockResolvedValue(accepted);
     (mock.projectMember.findUnique as jest.Mock).mockResolvedValue(null);
     (mock.projectMember.create as jest.Mock).mockResolvedValue({});
@@ -75,19 +71,17 @@ describe("respondToInvitation mutation", () => {
 
     expect(result).toEqual(accepted);
     expect(mock.invitation.update).toHaveBeenCalledWith(
-      expect.objectContaining({ data: { status: "ACCEPTED" } }),
+      expect.objectContaining({ data: { status: 'ACCEPTED' } }),
     );
     expect(mock.projectMember.create).toHaveBeenCalledWith({
       data: { projectId: 10, userId: 2 },
     });
   });
 
-  it("rejects invitation: sets status REJECTED and does NOT add project member", async () => {
-    const rejected = { ...pendingInvitation, status: "REJECTED" };
+  it('rejects invitation: sets status REJECTED and does NOT add project member', async () => {
+    const rejected = { ...pendingInvitation, status: 'REJECTED' };
 
-    (mock.invitation.findUnique as jest.Mock).mockResolvedValue(
-      pendingInvitation,
-    );
+    (mock.invitation.findUnique as jest.Mock).mockResolvedValue(pendingInvitation);
     (mock.invitation.update as jest.Mock).mockResolvedValue(rejected);
 
     const result = await invitationResolvers.Mutation.respondToInvitation(
@@ -98,7 +92,7 @@ describe("respondToInvitation mutation", () => {
 
     expect(result).toEqual(rejected);
     expect(mock.invitation.update).toHaveBeenCalledWith(
-      expect.objectContaining({ data: { status: "REJECTED" } }),
+      expect.objectContaining({ data: { status: 'REJECTED' } }),
     );
     expect(mock.projectMember.create).not.toHaveBeenCalled();
   });
@@ -106,21 +100,19 @@ describe("respondToInvitation mutation", () => {
 
 // ─── inviteUserToProject ──────────────────────────────────────────────────────
 
-describe("inviteUserToProject mutation", () => {
-  it("throws when a pending invitation for this user already exists", async () => {
+describe('inviteUserToProject mutation', () => {
+  it('throws when a pending invitation for this user already exists', async () => {
     (mock.project.findUnique as jest.Mock).mockResolvedValue(fakeProject);
     (mock.user.findUnique as jest.Mock).mockResolvedValue(fakeInvitee);
-    (mock.invitation.findFirst as jest.Mock).mockResolvedValue(
-      pendingInvitation,
-    );
+    (mock.invitation.findFirst as jest.Mock).mockResolvedValue(pendingInvitation);
 
     await expect(
       invitationResolvers.Mutation.inviteUserToProject(
         undefined,
-        { projectId: 10, email: "bob@example.com" },
+        { projectId: 10, email: 'bob@example.com' },
         ctx(1),
       ),
-    ).rejects.toThrow("User already has a pending invitation for this project");
+    ).rejects.toThrow('User already has a pending invitation for this project');
 
     expect(mock.invitation.create).not.toHaveBeenCalled();
   });
@@ -128,48 +120,40 @@ describe("inviteUserToProject mutation", () => {
 
 // ─── concurrent requests ──────────────────────────────────────────────────────
 
-describe("concurrent request handling", () => {
-  it("inviteUserToProject: second concurrent invite is rejected once first commits", async () => {
+describe('concurrent request handling', () => {
+  it('inviteUserToProject: second concurrent invite is rejected once first commits', async () => {
     (mock.project.findUnique as jest.Mock).mockResolvedValue(fakeProject);
     (mock.user.findUnique as jest.Mock).mockResolvedValue(fakeInvitee);
-    (mock.invitation.findFirst as jest.Mock).mockResolvedValue(
-      pendingInvitation,
-    );
+    (mock.invitation.findFirst as jest.Mock).mockResolvedValue(pendingInvitation);
 
     await expect(
       invitationResolvers.Mutation.inviteUserToProject(
         undefined,
-        { projectId: 10, email: "bob@example.com" },
+        { projectId: 10, email: 'bob@example.com' },
         ctx(1),
       ),
-    ).rejects.toThrow("User already has a pending invitation for this project");
+    ).rejects.toThrow('User already has a pending invitation for this project');
 
     expect(mock.invitation.create).not.toHaveBeenCalled();
     expect(prisma.$transaction).toHaveBeenCalledWith(
       expect.any(Function),
-      expect.objectContaining({ isolationLevel: "Serializable" }),
+      expect.objectContaining({ isolationLevel: 'Serializable' }),
     );
   });
 
-  it("respondToInvitation: second concurrent accept is rejected once first commits", async () => {
-    const alreadyAccepted = { ...pendingInvitation, status: "ACCEPTED" };
-    (mock.invitation.findUnique as jest.Mock).mockResolvedValue(
-      alreadyAccepted,
-    );
+  it('respondToInvitation: second concurrent accept is rejected once first commits', async () => {
+    const alreadyAccepted = { ...pendingInvitation, status: 'ACCEPTED' };
+    (mock.invitation.findUnique as jest.Mock).mockResolvedValue(alreadyAccepted);
 
     await expect(
-      invitationResolvers.Mutation.respondToInvitation(
-        undefined,
-        { id: 99, accept: true },
-        ctx(2),
-      ),
-    ).rejects.toThrow("Invitation already responded to");
+      invitationResolvers.Mutation.respondToInvitation(undefined, { id: 99, accept: true }, ctx(2)),
+    ).rejects.toThrow('Invitation already responded to');
 
     expect(mock.invitation.update).not.toHaveBeenCalled();
     expect(mock.projectMember.create).not.toHaveBeenCalled();
     expect(prisma.$transaction).toHaveBeenCalledWith(
       expect.any(Function),
-      expect.objectContaining({ isolationLevel: "Serializable" }),
+      expect.objectContaining({ isolationLevel: 'Serializable' }),
     );
   });
 });

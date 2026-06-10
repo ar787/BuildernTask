@@ -1,9 +1,9 @@
-import { authResolvers } from "./auth.js";
-import { projectResolvers } from "./project.js";
-import { invitationResolvers } from "./invitation.js";
-import { expenseResolvers } from "./expense.js";
-import { incomeResolvers } from "./income.js";
-import { budgetResolvers } from "./budget.js";
+import { authResolvers } from './auth.js';
+import { projectResolvers } from './project.js';
+import { invitationResolvers } from './invitation.js';
+import { expenseResolvers } from './expense.js';
+import { incomeResolvers } from './income.js';
+import { budgetResolvers } from './budget.js';
 
 export const resolvers = {
   Query: {

@@ -1,33 +1,33 @@
-import { GraphQLError } from "graphql";
-import type { AppContext } from "../context.js";
-import prisma from "../db.js";
+import { GraphQLError } from 'graphql';
+import type { AppContext } from '../context.js';
+import prisma from '../db.js';
 
 export const PERMISSIONS = {
   PROJECT: {
-    READ: "project:read",
-    UPDATE: "project:update",
-    DELETE: "project:delete",
+    READ: 'project:read',
+    UPDATE: 'project:update',
+    DELETE: 'project:delete',
   },
   EXPENSE: {
-    CREATE: "expense:create",
-    READ: "expense:read",
-    UPDATE: "expense:update",
-    DELETE: "expense:delete",
+    CREATE: 'expense:create',
+    READ: 'expense:read',
+    UPDATE: 'expense:update',
+    DELETE: 'expense:delete',
   },
   INCOME: {
-    CREATE: "income:create",
-    READ: "income:read",
-    UPDATE: "income:update",
-    DELETE: "income:delete",
+    CREATE: 'income:create',
+    READ: 'income:read',
+    UPDATE: 'income:update',
+    DELETE: 'income:delete',
   },
   INVITATION: {
-    SEND: "invitation:send",
-    READ: "invitation:read",
-    RESPOND: "invitation:respond",
+    SEND: 'invitation:send',
+    READ: 'invitation:read',
+    RESPOND: 'invitation:respond',
   },
 } as const;
 
-const ROLE_PERMISSIONS: Record<"owner" | "member", string[]> = {
+const ROLE_PERMISSIONS: Record<'owner' | 'member', string[]> = {
   owner: [
     PERMISSIONS.PROJECT.READ,
     PERMISSIONS.PROJECT.UPDATE,
@@ -59,25 +59,22 @@ export type ProjectRole = keyof typeof ROLE_PERMISSIONS;
 
 export function requireAuth(context: AppContext): number {
   if (!context.userId) {
-    throw new GraphQLError("Not authenticated", {
-      extensions: { code: "UNAUTHENTICATED" },
+    throw new GraphQLError('Not authenticated', {
+      extensions: { code: 'UNAUTHENTICATED' },
     });
   }
   return context.userId;
 }
 
-async function resolveProjectRole(
-  projectId: number,
-  userId: number,
-): Promise<ProjectRole | null> {
+async function resolveProjectRole(projectId: number, userId: number): Promise<ProjectRole | null> {
   const project = await prisma.project.findUnique({
     where: { id: projectId },
     include: { members: { where: { userId } } },
   });
 
   if (!project) return null;
-  if (project.ownerId === userId) return "owner";
-  if (project.members.length > 0) return "member";
+  if (project.ownerId === userId) return 'owner';
+  if (project.members.length > 0) return 'member';
   return null;
 }
 
@@ -89,8 +86,8 @@ export async function requirePermission(
   const role = await resolveProjectRole(projectId, userId);
 
   if (!role || !ROLE_PERMISSIONS[role].includes(permission)) {
-    throw new GraphQLError("Not authorized", {
-      extensions: { code: "FORBIDDEN" },
+    throw new GraphQLError('Not authorized', {
+      extensions: { code: 'FORBIDDEN' },
     });
   }
 }

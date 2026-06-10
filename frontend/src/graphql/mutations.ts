@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client";
-import type { TypedDocumentNode } from "@apollo/client";
-import type { Project, Invitation, Entry } from "../types";
+import { gql } from '@apollo/client';
+import type { TypedDocumentNode } from '@apollo/client';
+import type { Project, Invitation, Entry } from '../types';
 
 export const REGISTER_MUTATION = gql`
   mutation Register($name: String!, $email: String!, $password: String!) {
@@ -71,7 +71,7 @@ export const DELETE_PROJECT_MUTATION: TypedDocumentNode<
 `;
 
 export const RESPOND_INVITATION_MUTATION: TypedDocumentNode<
-  { respondToInvitation: Pick<Invitation, "id" | "status"> },
+  { respondToInvitation: Pick<Invitation, 'id' | 'status'> },
   { id: number; accept: boolean }
 > = gql`
   mutation RespondToInvitation($id: Int!, $accept: Boolean!) {
@@ -93,7 +93,10 @@ export const CREATE_EXPENSE_MUTATION: TypedDocumentNode<
       amount
       userId
       createdAt
-      user { id name }
+      user {
+        id
+        name
+      }
     }
   }
 `;
@@ -129,7 +132,10 @@ export const CREATE_INCOME_MUTATION: TypedDocumentNode<
       amount
       userId
       createdAt
-      user { id name }
+      user {
+        id
+        name
+      }
     }
   }
 `;
@@ -145,14 +151,12 @@ export const UPDATE_INCOME_MUTATION = gql`
   }
 `;
 
-export const DELETE_INCOME_MUTATION: TypedDocumentNode<
-  { deleteIncome: boolean },
-  { id: number }
-> = gql`
-  mutation DeleteIncome($id: Int!) {
-    deleteIncome(id: $id)
-  }
-`;
+export const DELETE_INCOME_MUTATION: TypedDocumentNode<{ deleteIncome: boolean }, { id: number }> =
+  gql`
+    mutation DeleteIncome($id: Int!) {
+      deleteIncome(id: $id)
+    }
+  `;
 
 export const INVITE_USER_MUTATION: TypedDocumentNode<
   { inviteUserToProject: Invitation },
