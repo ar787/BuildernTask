@@ -3,6 +3,7 @@ import { invitationResolvers } from "../schema/resolvers/invitation.js";
 jest.mock("../db.js", () => ({
   __esModule: true,
   default: {
+    $transaction: jest.fn(),
     project: { findUnique: jest.fn() },
     user: { findUnique: jest.fn() },
     invitation: {
@@ -45,7 +46,13 @@ const pendingInvitation = {
   project: fakeProject,
 };
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  // Make $transaction execute the callback immediately with the same mock client
+  (prisma.$transaction as jest.Mock).mockImplementation(
+    (fn: (tx: typeof prisma) => unknown) => fn(prisma),
+  );
+});
 
 // ─── respondToInvitation ─────────────────────────────────────────────────────
 
@@ -116,5 +123,53 @@ describe("inviteUserToProject mutation", () => {
     ).rejects.toThrow("User already has a pending invitation for this project");
 
     expect(mock.invitation.create).not.toHaveBeenCalled();
+  });
+});
+
+// ─── concurrent requests ──────────────────────────────────────────────────────
+
+describe("concurrent request handling", () => {
+  it("inviteUserToProject: second concurrent invite is rejected once first commits", async () => {
+    (mock.project.findUnique as jest.Mock).mockResolvedValue(fakeProject);
+    (mock.user.findUnique as jest.Mock).mockResolvedValue(fakeInvitee);
+    (mock.invitation.findFirst as jest.Mock).mockResolvedValue(
+      pendingInvitation,
+    );
+
+    await expect(
+      invitationResolvers.Mutation.inviteUserToProject(
+        undefined,
+        { projectId: 10, email: "bob@example.com" },
+        ctx(1),
+      ),
+    ).rejects.toThrow("User already has a pending invitation for this project");
+
+    expect(mock.invitation.create).not.toHaveBeenCalled();
+    expect(prisma.$transaction).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.objectContaining({ isolationLevel: "Serializable" }),
+    );
+  });
+
+  it("respondToInvitation: second concurrent accept is rejected once first commits", async () => {
+    const alreadyAccepted = { ...pendingInvitation, status: "ACCEPTED" };
+    (mock.invitation.findUnique as jest.Mock).mockResolvedValue(
+      alreadyAccepted,
+    );
+
+    await expect(
+      invitationResolvers.Mutation.respondToInvitation(
+        undefined,
+        { id: 99, accept: true },
+        ctx(2),
+      ),
+    ).rejects.toThrow("Invitation already responded to");
+
+    expect(mock.invitation.update).not.toHaveBeenCalled();
+    expect(mock.projectMember.create).not.toHaveBeenCalled();
+    expect(prisma.$transaction).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.objectContaining({ isolationLevel: "Serializable" }),
+    );
   });
 });
