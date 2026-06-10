@@ -1,8 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
 import {
   Box,
   Button,
@@ -10,11 +7,6 @@ import {
   CardActionArea,
   CardContent,
   Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
   Typography,
   AppBar,
   Toolbar,
@@ -22,13 +14,7 @@ import {
   Alert,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-
-const projectSchema = yup.object({
-  name: yup.string().min(1).required("Name is required"),
-  location: yup.string().min(1).required("Location is required"),
-});
-
-type ProjectFormValues = yup.InferType<typeof projectSchema>;
+import { CreateProjectDialog } from "../components/CreateProjectDialog";
 
 type Project = {
   id: number;
@@ -54,29 +40,6 @@ export function ProjectsPage({
 }: Readonly<ProjectsPageProps>) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [creating, setCreating] = useState(false);
-  const [createError, setCreateError] = useState<string>();
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<ProjectFormValues>({ resolver: yupResolver(projectSchema) });
-
-  const handleCreate = async (values: ProjectFormValues) => {
-    setCreateError(undefined);
-    setCreating(true);
-    try {
-      await onCreate(values);
-      reset();
-      setOpen(false);
-    } catch (e) {
-      setCreateError(e instanceof Error ? e.message : "Something went wrong");
-    } finally {
-      setCreating(false);
-    }
-  };
 
   return (
     <>
@@ -138,52 +101,11 @@ export function ProjectsPage({
         )}
       </Container>
 
-      <Dialog
+      <CreateProjectDialog
         open={open}
         onClose={() => setOpen(false)}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle>New Project</DialogTitle>
-        <Box component="form" onSubmit={handleSubmit(handleCreate)}>
-          <DialogContent>
-            {createError && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {createError}
-              </Alert>
-            )}
-            <TextField
-              label="Name"
-              fullWidth
-              margin="dense"
-              {...register("name")}
-              error={!!errors.name}
-              helperText={errors.name?.message}
-            />
-            <TextField
-              label="Location"
-              fullWidth
-              margin="dense"
-              {...register("location")}
-              error={!!errors.location}
-              helperText={errors.location?.message}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => {
-                setOpen(false);
-                reset();
-              }}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" variant="contained" disabled={creating}>
-              {creating ? "Creating…" : "Create"}
-            </Button>
-          </DialogActions>
-        </Box>
-      </Dialog>
+        onSubmit={onCreate}
+      />
     </>
   );
 }
