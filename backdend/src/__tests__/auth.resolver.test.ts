@@ -16,7 +16,14 @@ const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 const mockBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 const mockJwt = jwt as jest.Mocked<typeof jwt>;
 
-const fakeUser = { id: 1, name: "Alice", email: "alice@example.com", password: "hashed", createdAt: new Date(), updatedAt: new Date() };
+const fakeUser = {
+  id: 1,
+  name: "Alice",
+  email: "alice@example.com",
+  password: "hashed",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -32,10 +39,11 @@ describe("register mutation", () => {
     (mockBcrypt.hash as jest.Mock).mockResolvedValue("hashed");
     (mockPrisma.user.create as jest.Mock).mockResolvedValue(fakeUser);
 
-    const result = await authResolvers.Mutation.register(
-      undefined,
-      { name: "Alice", email: "alice@example.com", password: "secret" },
-    );
+    const result = await authResolvers.Mutation.register(undefined, {
+      name: "Alice",
+      email: "alice@example.com",
+      password: "secret",
+    });
 
     expect(result).toEqual({ token: "mock-token", user: fakeUser });
   });
@@ -45,10 +53,11 @@ describe("register mutation", () => {
     (mockBcrypt.hash as jest.Mock).mockResolvedValue("hashed");
     (mockPrisma.user.create as jest.Mock).mockResolvedValue(fakeUser);
 
-    await authResolvers.Mutation.register(
-      undefined,
-      { name: "Alice", email: "alice@example.com", password: "secret" },
-    );
+    await authResolvers.Mutation.register(undefined, {
+      name: "Alice",
+      email: "alice@example.com",
+      password: "secret",
+    });
 
     expect(mockBcrypt.hash).toHaveBeenCalledWith("secret", 10);
   });
@@ -57,17 +66,19 @@ describe("register mutation", () => {
     (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(fakeUser);
 
     await expect(
-      authResolvers.Mutation.register(
-        undefined,
-        { name: "Alice", email: "alice@example.com", password: "secret" },
-      ),
+      authResolvers.Mutation.register(undefined, {
+        name: "Alice",
+        email: "alice@example.com",
+        password: "secret",
+      }),
     ).rejects.toThrow(GraphQLError);
 
     await expect(
-      authResolvers.Mutation.register(
-        undefined,
-        { name: "Alice", email: "alice@example.com", password: "secret" },
-      ),
+      authResolvers.Mutation.register(undefined, {
+        name: "Alice",
+        email: "alice@example.com",
+        password: "secret",
+      }),
     ).rejects.toMatchObject({ extensions: { code: "BAD_USER_INPUT" } });
   });
 });
@@ -79,10 +90,10 @@ describe("login mutation", () => {
     (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(fakeUser);
     (mockBcrypt.compare as jest.Mock).mockResolvedValue(true);
 
-    const result = await authResolvers.Mutation.login(
-      undefined,
-      { email: "alice@example.com", password: "secret" },
-    );
+    const result = await authResolvers.Mutation.login(undefined, {
+      email: "alice@example.com",
+      password: "secret",
+    });
 
     expect(result).toEqual({ token: "mock-token", user: fakeUser });
   });
@@ -91,10 +102,10 @@ describe("login mutation", () => {
     (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(null);
 
     await expect(
-      authResolvers.Mutation.login(
-        undefined,
-        { email: "nobody@example.com", password: "secret" },
-      ),
+      authResolvers.Mutation.login(undefined, {
+        email: "nobody@example.com",
+        password: "secret",
+      }),
     ).rejects.toMatchObject({ extensions: { code: "UNAUTHENTICATED" } });
   });
 
@@ -103,10 +114,10 @@ describe("login mutation", () => {
     (mockBcrypt.compare as jest.Mock).mockResolvedValue(false);
 
     await expect(
-      authResolvers.Mutation.login(
-        undefined,
-        { email: "alice@example.com", password: "wrong" },
-      ),
+      authResolvers.Mutation.login(undefined, {
+        email: "alice@example.com",
+        password: "wrong",
+      }),
     ).rejects.toMatchObject({ extensions: { code: "UNAUTHENTICATED" } });
   });
 });
@@ -117,14 +128,20 @@ describe("me query", () => {
   it("returns user when userId is in context", async () => {
     (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(fakeUser);
 
-    const result = await authResolvers.Query.me(undefined, undefined, { userId: 1 });
+    const result = await authResolvers.Query.me(undefined, undefined, {
+      userId: 1,
+    });
 
     expect(result).toEqual(fakeUser);
-    expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({ where: { id: 1 } });
+    expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
+      where: { id: 1 },
+    });
   });
 
   it("returns null when no userId in context", async () => {
-    const result = await authResolvers.Query.me(undefined, undefined, { userId: null });
+    const result = await authResolvers.Query.me(undefined, undefined, {
+      userId: null,
+    });
 
     expect(result).toBeNull();
     expect(mockPrisma.user.findUnique).not.toHaveBeenCalled();
