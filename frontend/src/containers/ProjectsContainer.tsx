@@ -4,7 +4,9 @@ import { CREATE_PROJECT_MUTATION } from "../graphql/mutations";
 import { ProjectsPage } from "../pages/ProjectsPage";
 
 export function ProjectsContainer() {
-  const { data, loading, error } = useQuery(GET_PROJECTS_QUERY);
+  const { data, loading, error } = useQuery(GET_PROJECTS_QUERY, {
+    fetchPolicy: "network-only",
+  });
 
   const [createProject] = useMutation(CREATE_PROJECT_MUTATION, {
     refetchQueries: [GET_PROJECTS_QUERY],

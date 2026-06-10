@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@apollo/client/react";
 import { useParams } from "react-router-dom";
-import { GET_PROJECT_QUERY, GET_INVITATIONS_QUERY, GET_PROJECTS_QUERY } from "../graphql/queries";
+import { GET_PROJECT_QUERY, GET_INVITATIONS_QUERY } from "../graphql/queries";
 import {
   UPDATE_PROJECT_MUTATION,
   DELETE_PROJECT_MUTATION,
@@ -23,9 +23,7 @@ export function ProjectDetailContainer() {
 
   const [updateProject] = useMutation(UPDATE_PROJECT_MUTATION);
 
-  const [deleteProject] = useMutation(DELETE_PROJECT_MUTATION, {
-    refetchQueries: [GET_PROJECTS_QUERY],
-  });
+  const [deleteProject] = useMutation(DELETE_PROJECT_MUTATION);
 
   const [inviteUser] = useMutation(INVITE_USER_MUTATION, {
     refetchQueries: [{ query: GET_INVITATIONS_QUERY, variables: { projectId } }],
