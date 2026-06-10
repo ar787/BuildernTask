@@ -1,22 +1,29 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import {
+  ApolloClient,
+  InMemoryCache,
+  HttpLink,
+  ApolloLink,
+} from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
-import { setContext } from "@apollo/client/link/context";
 import { ThemeProvider, CssBaseline, createTheme } from "@mui/material";
 import App from "./App.tsx";
 
-const httpLink = createHttpLink({ uri: "http://localhost:4000/graphql" });
+const httpLink = new HttpLink({ uri: "http://localhost:4000/graphql" });
 
-const authLink = setContext((_, { headers }) => {
+const authLink = new ApolloLink((operation, forward) => {
   const token = localStorage.getItem("token");
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : "",
-    },
-  };
+  operation.setContext(
+    ({ headers = {} }: { headers?: Record<string, string> }) => ({
+      headers: {
+        ...headers,
+        authorization: token ? `Bearer ${token}` : "",
+      },
+    }),
+  );
+  return forward(operation);
 });
 
 const client = new ApolloClient({
