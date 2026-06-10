@@ -107,11 +107,12 @@ JWT_SECRET=your_jwt_secret_here
 
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=your_password
+DB_PASSWORD=your_password OR leave empty
 DB_NAME=buildern_task_db
+DATABASE_URL="mysql://root:your_password@localhost:3306/buildern_task_db"
+OR
+DATABASE_URL="mysql://root:@localhost:3306/buildern_task_db"
 
-# Equivalent connection URL (for reference):
-# DATABASE_URL="mysql://root:your_password@localhost:3306/buildern_task_db"
 ```
 
 | Variable      | Description                        | Default            |
