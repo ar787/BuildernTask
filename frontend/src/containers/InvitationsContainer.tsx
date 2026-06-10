@@ -7,7 +7,18 @@ export function InvitationsContainer() {
   const { data, loading, error } = useQuery(GET_RECEIVED_INVITATIONS_QUERY);
 
   const [respondToInvitation] = useMutation(RESPOND_INVITATION_MUTATION, {
-    refetchQueries: [GET_RECEIVED_INVITATIONS_QUERY],
+    update(cache, _, { variables }) {
+      const existing = cache.readQuery({ query: GET_RECEIVED_INVITATIONS_QUERY });
+      if (!existing) return;
+      cache.writeQuery({
+        query: GET_RECEIVED_INVITATIONS_QUERY,
+        data: {
+          receivedInvitations: existing.receivedInvitations.filter(
+            (i) => i.id !== variables?.id,
+          ),
+        },
+      });
+    },
   });
 
   const onRespond = async (id: number, accept: boolean) => {

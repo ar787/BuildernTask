@@ -45,29 +45,51 @@ export function ProjectFinanceContainer() {
 
   const onOpenBudget = () => fetchBudgetReport({ variables: { projectId } });
 
-  const expenseRefetch = {
-    query: GET_EXPENSES_QUERY,
-    variables: { projectId },
-  };
-  const incomeRefetch = { query: GET_INCOMES_QUERY, variables: { projectId } };
-
   const [createExpense] = useMutation(CREATE_EXPENSE_MUTATION, {
-    refetchQueries: [expenseRefetch],
+    update(cache, { data }) {
+      const existing = cache.readQuery({ query: GET_EXPENSES_QUERY, variables: { projectId } });
+      if (!existing || !data) return;
+      cache.writeQuery({
+        query: GET_EXPENSES_QUERY,
+        variables: { projectId },
+        data: { expenses: [...existing.expenses, data.createExpense] },
+      });
+    },
   });
-  const [updateExpense] = useMutation(UPDATE_EXPENSE_MUTATION, {
-    refetchQueries: [expenseRefetch],
-  });
+  const [updateExpense] = useMutation(UPDATE_EXPENSE_MUTATION);
   const [deleteExpense] = useMutation(DELETE_EXPENSE_MUTATION, {
-    refetchQueries: [expenseRefetch],
+    update(cache, _, { variables }) {
+      const existing = cache.readQuery({ query: GET_EXPENSES_QUERY, variables: { projectId } });
+      if (!existing) return;
+      cache.writeQuery({
+        query: GET_EXPENSES_QUERY,
+        variables: { projectId },
+        data: { expenses: existing.expenses.filter((e) => e.id !== variables?.id) },
+      });
+    },
   });
   const [createIncome] = useMutation(CREATE_INCOME_MUTATION, {
-    refetchQueries: [incomeRefetch],
+    update(cache, { data }) {
+      const existing = cache.readQuery({ query: GET_INCOMES_QUERY, variables: { projectId } });
+      if (!existing || !data) return;
+      cache.writeQuery({
+        query: GET_INCOMES_QUERY,
+        variables: { projectId },
+        data: { incomes: [...existing.incomes, data.createIncome] },
+      });
+    },
   });
-  const [updateIncome] = useMutation(UPDATE_INCOME_MUTATION, {
-    refetchQueries: [incomeRefetch],
-  });
+  const [updateIncome] = useMutation(UPDATE_INCOME_MUTATION);
   const [deleteIncome] = useMutation(DELETE_INCOME_MUTATION, {
-    refetchQueries: [incomeRefetch],
+    update(cache, _, { variables }) {
+      const existing = cache.readQuery({ query: GET_INCOMES_QUERY, variables: { projectId } });
+      if (!existing) return;
+      cache.writeQuery({
+        query: GET_INCOMES_QUERY,
+        variables: { projectId },
+        data: { incomes: existing.incomes.filter((e) => e.id !== variables?.id) },
+      });
+    },
   });
 
   return (

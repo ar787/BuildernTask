@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@apollo/client/react";
 import { useParams } from "react-router-dom";
-import { GET_PROJECT_QUERY, GET_INVITATIONS_QUERY } from "../graphql/queries";
+import { GET_PROJECT_QUERY, GET_INVITATIONS_QUERY, GET_PROJECTS_QUERY } from "../graphql/queries";
 import {
   UPDATE_PROJECT_MUTATION,
   DELETE_PROJECT_MUTATION,
@@ -23,10 +23,32 @@ export function ProjectDetailContainer() {
 
   const [updateProject] = useMutation(UPDATE_PROJECT_MUTATION);
 
-  const [deleteProject] = useMutation(DELETE_PROJECT_MUTATION);
+  const [deleteProject] = useMutation(DELETE_PROJECT_MUTATION, {
+    update(cache, _, { variables }) {
+      const existing = cache.readQuery({ query: GET_PROJECTS_QUERY });
+      if (!existing) return;
+      cache.writeQuery({
+        query: GET_PROJECTS_QUERY,
+        data: {
+          projects: existing.projects.filter((p) => p.id !== variables?.id),
+        },
+      });
+    },
+  });
 
   const [inviteUser] = useMutation(INVITE_USER_MUTATION, {
-    refetchQueries: [{ query: GET_INVITATIONS_QUERY, variables: { projectId } }],
+    update(cache, { data }) {
+      const existing = cache.readQuery({
+        query: GET_INVITATIONS_QUERY,
+        variables: { projectId },
+      });
+      if (!existing || !data) return;
+      cache.writeQuery({
+        query: GET_INVITATIONS_QUERY,
+        variables: { projectId },
+        data: { invitations: [...existing.invitations, data.inviteUserToProject] },
+      });
+    },
   });
 
   const onUpdate = async (values: { name?: string; location?: string }) => {
