@@ -90,7 +90,7 @@ export function ProjectDetailPage({
 
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="static" color="default" elevation={1}>
         <Toolbar>
           <IconButton
             color="inherit"

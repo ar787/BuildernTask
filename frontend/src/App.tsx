@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthGuard } from "./components/AuthGuard";
+import { AppLayout } from "./components/AppLayout";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { ProjectsContainer } from "./containers/ProjectsContainer";
@@ -13,10 +14,12 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route element={<AuthGuard />}>
-        <Route path="/projects" element={<ProjectsContainer />} />
-        <Route path="/projects/:id" element={<ProjectDetailContainer />} />
-        <Route path="/projects/:id/finance" element={<ProjectFinanceContainer />} />
-        <Route path="/invitations" element={<InvitationsContainer />} />
+        <Route element={<AppLayout />}>
+          <Route path="/projects" element={<ProjectsContainer />} />
+          <Route path="/projects/:id" element={<ProjectDetailContainer />} />
+          <Route path="/projects/:id/finance" element={<ProjectFinanceContainer />} />
+          <Route path="/invitations" element={<InvitationsContainer />} />
+        </Route>
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>

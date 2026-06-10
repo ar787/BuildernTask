@@ -18,14 +18,10 @@ import {
   Typography,
   AppBar,
   Toolbar,
-  IconButton,
   CircularProgress,
   Alert,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import LogoutIcon from "@mui/icons-material/Logout";
-import MailIcon from "@mui/icons-material/Mail";
-import { useAuth } from "../hooks/useAuth";
 
 const projectSchema = yup.object({
   name: yup.string().min(1).required("Name is required"),
@@ -57,7 +53,6 @@ export function ProjectsPage({
   onCreate,
 }: Readonly<ProjectsPageProps>) {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string>();
@@ -83,31 +78,13 @@ export function ProjectsPage({
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="static" color="default" elevation={1}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Projects
           </Typography>
-          <Typography variant="body2" sx={{ mr: 2 }}>
-            {user?.name}
-          </Typography>
-          <IconButton color="inherit" onClick={() => navigate("/invitations")}>
-            <MailIcon />
-          </IconButton>
-          <Button
-            color="inherit"
-            startIcon={<LogoutIcon />}
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
         </Toolbar>
       </AppBar>
 
