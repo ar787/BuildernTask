@@ -45,10 +45,10 @@ export function ProjectDetailContainer() {
 
   return (
     <ProjectDetailPage
-      project={(projectData as any)?.project}
+      project={projectData?.project}
       loading={loading}
       error={error?.message}
-      invitations={(invitationsData as any)?.invitations ?? []}
+      invitations={invitationsData?.invitations ?? []}
       invitationsLoading={invitationsLoading}
       onUpdate={onUpdate}
       onDelete={onDelete}

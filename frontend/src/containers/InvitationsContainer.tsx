@@ -16,7 +16,7 @@ export function InvitationsContainer() {
 
   return (
     <InvitationsPage
-      invitations={(data as any)?.receivedInvitations ?? []}
+      invitations={data?.receivedInvitations ?? []}
       loading={loading}
       error={error?.message}
       onRespond={onRespond}

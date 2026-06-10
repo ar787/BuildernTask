@@ -16,7 +16,7 @@ export function ProjectsContainer() {
 
   return (
     <ProjectsPage
-      projects={(data as any)?.projects ?? []}
+      projects={data?.projects ?? []}
       loading={loading}
       error={error?.message}
       onCreate={onCreate}

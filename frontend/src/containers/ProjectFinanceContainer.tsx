@@ -36,18 +36,10 @@ export function ProjectFinanceContainer() {
     error: incomesError,
   } = useQuery(GET_INCOMES_QUERY, { variables: { projectId } });
 
-  type BudgetLine = {
-    name: string;
-    totalExpense: number;
-    totalIncome: number;
-    difference: number;
-  };
-
   const [fetchBudgetReport, { data: budgetData, loading: budgetLoading }] =
     useLazyQuery(GET_BUDGET_REPORT_QUERY, { fetchPolicy: "network-only" });
 
-  const budgetReport: BudgetLine[] =
-    (budgetData as { budgetReport: BudgetLine[] } | undefined)?.budgetReport ?? [];
+  const budgetReport = budgetData?.budgetReport ?? [];
 
   const onOpenBudget = () => fetchBudgetReport({ variables: { projectId } });
 
@@ -64,9 +56,9 @@ export function ProjectFinanceContainer() {
   return (
     <ProjectFinancePage
       projectId={projectId}
-      ownerId={(projectData as any)?.project?.ownerId}
-      expenses={(expenseData as any)?.expenses ?? []}
-      incomes={(incomeData as any)?.incomes ?? []}
+      ownerId={projectData?.project?.ownerId}
+      expenses={expenseData?.expenses ?? []}
+      incomes={incomeData?.incomes ?? []}
       loading={expensesLoading || incomesLoading}
       error={(expensesError || incomesError)?.message}
       onCreateExpense={(v) => createExpense({ variables: { projectId, ...v } })}
