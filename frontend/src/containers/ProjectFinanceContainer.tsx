@@ -1,9 +1,10 @@
-import { useQuery, useMutation } from "@apollo/client/react";
+import { useQuery, useMutation, useLazyQuery } from "@apollo/client/react";
 import { useParams } from "react-router-dom";
 import {
   GET_PROJECT_QUERY,
   GET_EXPENSES_QUERY,
   GET_INCOMES_QUERY,
+  GET_BUDGET_REPORT_QUERY,
 } from "../graphql/queries";
 import {
   CREATE_EXPENSE_MUTATION,
@@ -35,6 +36,21 @@ export function ProjectFinanceContainer() {
     error: incomesError,
   } = useQuery(GET_INCOMES_QUERY, { variables: { projectId } });
 
+  type BudgetLine = {
+    name: string;
+    totalExpense: number;
+    totalIncome: number;
+    difference: number;
+  };
+
+  const [fetchBudgetReport, { data: budgetData, loading: budgetLoading }] =
+    useLazyQuery(GET_BUDGET_REPORT_QUERY, { fetchPolicy: "network-only" });
+
+  const budgetReport: BudgetLine[] =
+    (budgetData as { budgetReport: BudgetLine[] } | undefined)?.budgetReport ?? [];
+
+  const onOpenBudget = () => fetchBudgetReport({ variables: { projectId } });
+
   const expenseRefetch = { query: GET_EXPENSES_QUERY, variables: { projectId } };
   const incomeRefetch = { query: GET_INCOMES_QUERY, variables: { projectId } };
 
@@ -59,6 +75,9 @@ export function ProjectFinanceContainer() {
       onCreateIncome={(v) => createIncome({ variables: { projectId, ...v } })}
       onUpdateIncome={(id, v) => updateIncome({ variables: { id, ...v } })}
       onDeleteIncome={(id) => deleteIncome({ variables: { id } })}
+      budgetReport={budgetReport}
+      budgetLoading={budgetLoading}
+      onOpenBudget={onOpenBudget}
     />
   );
 }

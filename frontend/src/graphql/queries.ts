@@ -100,6 +100,17 @@ export const GET_INCOMES_QUERY = gql`
   }
 `;
 
+export const GET_BUDGET_REPORT_QUERY = gql`
+  query GetBudgetReport($projectId: Int!) {
+    budgetReport(projectId: $projectId) {
+      name
+      totalExpense
+      totalIncome
+      difference
+    }
+  }
+`;
+
 export const GET_RECEIVED_INVITATIONS_QUERY = gql`
   query GetReceivedInvitations {
     receivedInvitations {

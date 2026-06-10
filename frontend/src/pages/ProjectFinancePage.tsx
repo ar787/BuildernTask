@@ -21,8 +21,10 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 import { useAuth } from "../hooks/useAuth";
 import { FinanceEntryDialog } from "../components/FinanceEntryDialog";
+import { BudgetReportDialog } from "../components/BudgetReportDialog";
 
 type Entry = {
   id: number;
@@ -31,6 +33,13 @@ type Entry = {
   userId: number;
   createdAt: string;
   user: { id: number; name: string };
+};
+
+type BudgetLine = {
+  name: string;
+  totalExpense: number;
+  totalIncome: number;
+  difference: number;
 };
 
 type DialogState =
@@ -44,6 +53,9 @@ type ProjectFinancePageProps = {
   incomes: Entry[];
   loading: boolean;
   error?: string;
+  budgetReport: BudgetLine[];
+  budgetLoading: boolean;
+  onOpenBudget: () => void;
   onCreateExpense: (v: { name: string; amount: number }) => Promise<unknown>;
   onUpdateExpense: (
     id: number,
@@ -65,6 +77,9 @@ export function ProjectFinancePage({
   incomes,
   loading,
   error,
+  budgetReport,
+  budgetLoading,
+  onOpenBudget,
   onCreateExpense,
   onUpdateExpense,
   onDeleteExpense,
@@ -79,6 +94,7 @@ export function ProjectFinancePage({
   const [dialog, setDialog] = useState<DialogState>({ open: false });
   const [mutationError, setMutationError] = useState<string | undefined>();
   const [mutating, setMutating] = useState(false);
+  const [budgetOpen, setBudgetOpen] = useState(false);
 
   const isExpenseTab = tab === 0;
   const entries: Entry[] = isExpenseTab ? expenses : incomes;
@@ -142,6 +158,17 @@ export function ProjectFinancePage({
           <Typography variant="h6" sx={{ flexGrow: 1, ml: 1 }}>
             Finance
           </Typography>
+          <Button
+            color="inherit"
+            startIcon={<AssessmentIcon />}
+            onClick={() => {
+              onOpenBudget();
+              setBudgetOpen(true);
+            }}
+            sx={{ mr: 1 }}
+          >
+            Budget
+          </Button>
           <Button color="inherit" startIcon={<AddIcon />} onClick={openAdd}>
             Add
           </Button>
@@ -223,6 +250,13 @@ export function ProjectFinancePage({
           </List>
         )}
       </Container>
+
+      <BudgetReportDialog
+        open={budgetOpen}
+        onClose={() => setBudgetOpen(false)}
+        budgetReport={budgetReport}
+        loading={budgetLoading}
+      />
 
       {dialog.open && (
         <FinanceEntryDialog
