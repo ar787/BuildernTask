@@ -15,7 +15,11 @@ export const authResolvers = {
   Mutation: {
     register: async (
       _: unknown,
-      { name, email, password }: { name: string; email: string; password: string }
+      {
+        name,
+        email,
+        password,
+      }: { name: string; email: string; password: string },
     ) => {
       const existing = await prisma.user.findUnique({ where: { email } });
       if (existing) {
@@ -32,7 +36,7 @@ export const authResolvers = {
       const token = jwt.sign(
         { userId: user.id, email: user.email },
         process.env.JWT_SECRET!,
-        { expiresIn: "7d" }
+        { expiresIn: "7d" },
       );
 
       return { token, user };
@@ -40,10 +44,12 @@ export const authResolvers = {
 
     login: async (
       _: unknown,
-      { email, password }: { email: string; password: string }
+      { email, password }: { email: string; password: string },
     ) => {
       const user = await prisma.user.findUnique({ where: { email } });
-      const valid = user ? await bcrypt.compare(password, user.password) : false;
+      const valid = user
+        ? await bcrypt.compare(password, user.password)
+        : false;
 
       if (!user || !valid) {
         throw new GraphQLError("Invalid credentials", {
@@ -54,7 +60,7 @@ export const authResolvers = {
       const token = jwt.sign(
         { userId: user.id, email: user.email },
         process.env.JWT_SECRET!,
-        { expiresIn: "7d" }
+        { expiresIn: "7d" },
       );
 
       return { token, user };

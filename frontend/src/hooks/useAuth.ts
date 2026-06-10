@@ -7,11 +7,26 @@ interface AuthUser {
   name: string;
 }
 
-const TOKEN_KEY = "token";
-const USER_KEY = "auth_user";
+export const TOKEN_KEY = "token";
+export const USER_KEY = "auth_user";
+
+export function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+}
 
 function getStoredUser(): AuthUser | null {
   try {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      return null;
+    }
     const raw = localStorage.getItem(USER_KEY);
     return raw ? (JSON.parse(raw) as AuthUser) : null;
   } catch {
