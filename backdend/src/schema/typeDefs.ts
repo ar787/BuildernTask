@@ -64,6 +64,13 @@ export const typeDefs = `#graphql
     updatedAt: String!
   }
 
+  type BudgetLine {
+    name: String!
+    totalExpense: Float!
+    totalIncome: Float!
+    difference: Float!
+  }
+
   type Query {
     me: User
     projects: [Project!]!
@@ -72,6 +79,7 @@ export const typeDefs = `#graphql
     receivedInvitations: [Invitation!]!
     expenses(projectId: Int!): [Expense!]!
     incomes(projectId: Int!): [Income!]!
+    budgetReport(projectId: Int!): [BudgetLine!]!
   }
 
   type Mutation {

@@ -3,6 +3,7 @@ import { projectResolvers } from "./project.js";
 import { invitationResolvers } from "./invitation.js";
 import { expenseResolvers } from "./expense.js";
 import { incomeResolvers } from "./income.js";
+import { budgetResolvers } from "./budget.js";
 
 export const resolvers = {
   Query: {
@@ -11,6 +12,7 @@ export const resolvers = {
     ...invitationResolvers.Query,
     ...expenseResolvers.Query,
     ...incomeResolvers.Query,
+    ...budgetResolvers.Query,
   },
   Mutation: {
     ...authResolvers.Mutation,
