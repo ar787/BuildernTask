@@ -55,6 +55,7 @@ type ProjectFinancePageProps = {
   error?: string;
   budgetReport: BudgetLine[];
   budgetLoading: boolean;
+  budgetError?: string;
   onOpenBudget: () => void;
   onCreateExpense: (v: { name: string; amount: number }) => Promise<unknown>;
   onUpdateExpense: (
@@ -79,6 +80,7 @@ export function ProjectFinancePage({
   error,
   budgetReport,
   budgetLoading,
+  budgetError,
   onOpenBudget,
   onCreateExpense,
   onUpdateExpense,
@@ -256,6 +258,7 @@ export function ProjectFinancePage({
         onClose={() => setBudgetOpen(false)}
         budgetReport={budgetReport}
         loading={budgetLoading}
+        error={budgetError}
       />
 
       {dialog.open && (

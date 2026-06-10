@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Alert,
   CircularProgress,
   Dialog,
   DialogContent,
@@ -24,6 +25,7 @@ type BudgetReportDialogProps = {
   onClose: () => void;
   budgetReport: BudgetLine[];
   loading: boolean;
+  error?: string;
 };
 
 export function BudgetReportDialog({
@@ -31,10 +33,13 @@ export function BudgetReportDialog({
   onClose,
   budgetReport,
   loading,
+  error,
 }: Readonly<BudgetReportDialogProps>) {
   let content: React.ReactNode;
   if (loading) {
     content = <CircularProgress />;
+  } else if (error) {
+    content = <Alert severity="error">{error}</Alert>;
   } else if (budgetReport.length === 0) {
     content = <Typography color="text.secondary">No data yet.</Typography>;
   } else {
@@ -52,11 +57,15 @@ export function BudgetReportDialog({
           {budgetReport.map((row) => (
             <TableRow key={row.name}>
               <TableCell>{row.name}</TableCell>
-              <TableCell align="right">${row.totalExpense.toFixed(2)}</TableCell>
+              <TableCell align="right">
+                ${row.totalExpense.toFixed(2)}
+              </TableCell>
               <TableCell align="right">${row.totalIncome.toFixed(2)}</TableCell>
               <TableCell
                 align="right"
-                sx={{ color: row.difference >= 0 ? "success.main" : "error.main" }}
+                sx={{
+                  color: row.difference >= 0 ? "success.main" : "error.main",
+                }}
               >
                 {row.difference >= 0 ? "+" : ""}${row.difference.toFixed(2)}
               </TableCell>

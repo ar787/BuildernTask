@@ -36,22 +36,39 @@ export function ProjectFinanceContainer() {
     error: incomesError,
   } = useQuery(GET_INCOMES_QUERY, { variables: { projectId } });
 
-  const [fetchBudgetReport, { data: budgetData, loading: budgetLoading }] =
-    useLazyQuery(GET_BUDGET_REPORT_QUERY, { fetchPolicy: "network-only" });
+  const [
+    fetchBudgetReport,
+    { data: budgetData, loading: budgetLoading, error: budgetError },
+  ] = useLazyQuery(GET_BUDGET_REPORT_QUERY, { fetchPolicy: "network-only" });
 
   const budgetReport = budgetData?.budgetReport ?? [];
 
   const onOpenBudget = () => fetchBudgetReport({ variables: { projectId } });
 
-  const expenseRefetch = { query: GET_EXPENSES_QUERY, variables: { projectId } };
+  const expenseRefetch = {
+    query: GET_EXPENSES_QUERY,
+    variables: { projectId },
+  };
   const incomeRefetch = { query: GET_INCOMES_QUERY, variables: { projectId } };
 
-  const [createExpense] = useMutation(CREATE_EXPENSE_MUTATION, { refetchQueries: [expenseRefetch] });
-  const [updateExpense] = useMutation(UPDATE_EXPENSE_MUTATION, { refetchQueries: [expenseRefetch] });
-  const [deleteExpense] = useMutation(DELETE_EXPENSE_MUTATION, { refetchQueries: [expenseRefetch] });
-  const [createIncome] = useMutation(CREATE_INCOME_MUTATION, { refetchQueries: [incomeRefetch] });
-  const [updateIncome] = useMutation(UPDATE_INCOME_MUTATION, { refetchQueries: [incomeRefetch] });
-  const [deleteIncome] = useMutation(DELETE_INCOME_MUTATION, { refetchQueries: [incomeRefetch] });
+  const [createExpense] = useMutation(CREATE_EXPENSE_MUTATION, {
+    refetchQueries: [expenseRefetch],
+  });
+  const [updateExpense] = useMutation(UPDATE_EXPENSE_MUTATION, {
+    refetchQueries: [expenseRefetch],
+  });
+  const [deleteExpense] = useMutation(DELETE_EXPENSE_MUTATION, {
+    refetchQueries: [expenseRefetch],
+  });
+  const [createIncome] = useMutation(CREATE_INCOME_MUTATION, {
+    refetchQueries: [incomeRefetch],
+  });
+  const [updateIncome] = useMutation(UPDATE_INCOME_MUTATION, {
+    refetchQueries: [incomeRefetch],
+  });
+  const [deleteIncome] = useMutation(DELETE_INCOME_MUTATION, {
+    refetchQueries: [incomeRefetch],
+  });
 
   return (
     <ProjectFinancePage
@@ -69,6 +86,7 @@ export function ProjectFinanceContainer() {
       onDeleteIncome={(id) => deleteIncome({ variables: { id } })}
       budgetReport={budgetReport}
       budgetLoading={budgetLoading}
+      budgetError={budgetError?.message}
       onOpenBudget={onOpenBudget}
     />
   );

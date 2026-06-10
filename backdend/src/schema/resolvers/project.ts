@@ -1,6 +1,10 @@
 import { GraphQLError } from "graphql";
 import prisma from "../../db.js";
-import { requireAuth, requirePermission, PERMISSIONS } from "../../middleware/auth.js";
+import {
+  requireAuth,
+  requirePermission,
+  PERMISSIONS,
+} from "../../middleware/auth.js";
 import type { AppContext } from "../../context.js";
 
 const projectInclude = {
@@ -20,7 +24,11 @@ export const projectResolvers = {
       });
     },
 
-    project: async (_: unknown, { id }: { id: number }, context: AppContext) => {
+    project: async (
+      _: unknown,
+      { id }: { id: number },
+      context: AppContext,
+    ) => {
       const userId = requireAuth(context);
       const project = await prisma.project.findFirst({
         where: {
@@ -42,7 +50,7 @@ export const projectResolvers = {
     createProject: async (
       _: unknown,
       { name, location }: { name: string; location: string },
-      context: AppContext
+      context: AppContext,
     ) => {
       const userId = requireAuth(context);
       return prisma.project.create({
@@ -54,7 +62,7 @@ export const projectResolvers = {
     updateProject: async (
       _: unknown,
       { id, name, location }: { id: number; name?: string; location?: string },
-      context: AppContext
+      context: AppContext,
     ) => {
       const userId = requireAuth(context);
       const project = await prisma.project.findUnique({ where: { id } });
@@ -77,7 +85,7 @@ export const projectResolvers = {
     deleteProject: async (
       _: unknown,
       { id }: { id: number },
-      context: AppContext
+      context: AppContext,
     ) => {
       const userId = requireAuth(context);
       const project = await prisma.project.findUnique({ where: { id } });
